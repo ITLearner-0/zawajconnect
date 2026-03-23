@@ -548,11 +548,11 @@ const Compare = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="container mx-auto max-w-6xl">
-          <Card className="animate-pulse">
+          <Card className="animate-pulse" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardContent className="p-8">
-              <div className="h-64 bg-muted rounded"></div>
+              <div className="h-64 rounded" style={{ backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-md)' }}></div>
             </CardContent>
           </Card>
         </div>
@@ -561,23 +561,23 @@ const Compare = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Historique des Comparaisons</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Historique des Comparaisons</h1>
+            <p style={{ color: 'var(--color-text-muted)' }}>
               Retrouvez toutes vos comparaisons de profils précédentes
             </p>
           </div>
           <Button
             variant={showStatistics ? 'default' : 'outline'}
             onClick={() => setShowStatistics(!showStatistics)}
-            className={
+            style={
               showStatistics
-                ? 'bg-emerald text-white'
-                : 'border-emerald text-emerald hover:bg-emerald hover:text-white'
+                ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }
+                : { borderColor: 'var(--color-primary)', color: 'var(--color-primary)', borderRadius: 'var(--radius-md)' }
             }
           >
             <BarChart3 className="h-4 w-4 mr-2" />
@@ -593,7 +593,7 @@ const Compare = () => {
         )}
 
         {/* Filters */}
-        <Card className="mb-6">
+        <Card className="mb-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="p-4">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-wrap">
@@ -650,10 +650,10 @@ const Compare = () => {
                 <Button
                   variant={favoritesOnly ? 'default' : 'outline'}
                   onClick={() => setFavoritesOnly(!favoritesOnly)}
-                  className={
+                  style={
                     favoritesOnly
-                      ? 'bg-gold text-white'
-                      : 'border-gold text-gold hover:bg-gold hover:text-white'
+                      ? { backgroundColor: 'var(--color-warning)', color: '#fff', borderRadius: 'var(--radius-md)' }
+                      : { borderColor: 'var(--color-warning)', color: 'var(--color-warning)', borderRadius: 'var(--radius-md)' }
                   }
                 >
                   <Star className="h-4 w-4 mr-2" />
@@ -663,7 +663,7 @@ const Compare = () => {
                 <Button
                   variant="outline"
                   onClick={() => navigate('/browse')}
-                  className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+                  style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)', borderRadius: 'var(--radius-md)' }}
                 >
                   Nouvelle comparaison
                 </Button>
@@ -672,10 +672,10 @@ const Compare = () => {
                   <Button
                     variant={selectedForExport.length > 0 ? 'default' : 'outline'}
                     onClick={selectAllForExport}
-                    className={
+                    style={
                       selectedForExport.length > 0
-                        ? 'bg-gold text-white'
-                        : 'border-gold text-gold hover:bg-gold hover:text-white'
+                        ? { backgroundColor: 'var(--color-warning)', color: '#fff', borderRadius: 'var(--radius-md)' }
+                        : { borderColor: 'var(--color-warning)', color: 'var(--color-warning)', borderRadius: 'var(--radius-md)' }
                     }
                   >
                     <CheckSquare className="h-4 w-4 mr-2" />
@@ -695,11 +695,12 @@ const Compare = () => {
                     <Badge
                       key={tag}
                       variant={selectedTags.includes(tag) ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-colors ${
+                      className="cursor-pointer transition-colors"
+                      style={
                         selectedTags.includes(tag)
-                          ? 'bg-emerald text-white hover:bg-emerald/90'
-                          : 'hover:bg-emerald/10'
-                      }`}
+                          ? { backgroundColor: 'var(--color-primary)', color: '#fff' }
+                          : {}
+                      }
                       onClick={() => toggleTagFilter(tag)}
                     >
                       {tag}
@@ -723,9 +724,9 @@ const Compare = () => {
 
         {/* History List */}
         {filteredHistory.length === 0 ? (
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardContent className="p-12 text-center">
-              <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <Calendar className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
               <h3 className="text-lg font-semibold mb-2">
                 {history.length === 0 ? 'Aucune comparaison' : 'Aucune comparaison trouvée'}
               </h3>
@@ -737,7 +738,7 @@ const Compare = () => {
               <Button
                 onClick={() => navigate('/browse')}
                 variant="outline"
-                className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+                style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)', borderRadius: 'var(--radius-md)' }}
               >
                 Découvrir des profils
               </Button>
@@ -746,7 +747,7 @@ const Compare = () => {
         ) : (
           <div className="grid gap-4">
             {filteredHistory.map((comparison) => (
-              <Card key={comparison.id} className="hover:shadow-lg transition-shadow">
+              <Card key={comparison.id} className="hover:shadow-lg transition-shadow" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     {/* Checkbox for multiple export */}
@@ -829,10 +830,9 @@ const Compare = () => {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleView(comparison)}
-                        className="hover:bg-emerald/10"
                         title="Voir"
                       >
-                        <Eye className="h-4 w-4 text-emerald" />
+                        <Eye className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
                       </Button>
                       <Button
                         size="sm"
@@ -871,7 +871,7 @@ const Compare = () => {
                   disabled={exportingPdf}
                   variant="outline"
                   size="sm"
-                  className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+                  style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)', borderRadius: 'var(--radius-md)' }}
                 >
                   <Download className="h-4 w-4 mr-2" />
                   {exportingPdf ? 'Export en cours...' : 'Exporter en PDF'}
@@ -931,7 +931,7 @@ const Compare = () => {
               </Button>
               <Button
                 onClick={handleSaveEdit}
-                className="bg-emerald text-white hover:bg-emerald-dark"
+                style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
               >
                 Enregistrer
               </Button>
@@ -995,7 +995,7 @@ const Compare = () => {
                         <Badge
                           key={tag}
                           variant="outline"
-                          className="cursor-pointer hover:bg-emerald/10"
+                          className="cursor-pointer"
                           onClick={() => setEditingTags([...editingTags, tag])}
                         >
                           {tag}
@@ -1011,7 +1011,7 @@ const Compare = () => {
               </Button>
               <Button
                 onClick={handleSaveTags}
-                className="bg-emerald text-white hover:bg-emerald-dark"
+                style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
               >
                 Enregistrer
               </Button>
@@ -1027,7 +1027,8 @@ const Compare = () => {
             size="lg"
             onClick={handleExportMultiple}
             disabled={exportingMultiple}
-            className="bg-gradient-to-r from-gold to-emerald text-white shadow-2xl hover:shadow-gold/50 px-8 py-6 text-lg"
+            className="shadow-2xl px-8 py-6 text-lg"
+            style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
           >
             <FileText className="h-5 w-5 mr-2" />
             {exportingMultiple

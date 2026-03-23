@@ -144,10 +144,10 @@ export default function BadgeLeaderboard() {
   };
 
   const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Crown className="w-5 h-5 text-yellow-500" />;
-    if (rank === 2) return <Trophy className="w-5 h-5 text-gray-400" />;
-    if (rank === 3) return <Trophy className="w-5 h-5 text-amber-600" />;
-    return <span className="text-sm font-semibold text-muted-foreground">#{rank}</span>;
+    if (rank === 1) return <Crown className="w-5 h-5" style={{ color: 'var(--color-warning)' }} />;
+    if (rank === 2) return <Trophy className="w-5 h-5" style={{ color: 'var(--color-text-muted)' }} />;
+    if (rank === 3) return <Trophy className="w-5 h-5" style={{ color: 'var(--color-warning)' }} />;
+    return <span className="text-sm font-semibold" style={{ color: 'var(--color-text-muted)' }}>#{rank}</span>;
   };
 
   const renderLeaderboardEntry = (
@@ -157,25 +157,27 @@ export default function BadgeLeaderboard() {
   ) => (
     <div
       key={entry.user_id}
-      className="flex items-center gap-4 p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
+      className="flex items-center gap-4 p-4 transition-colors"
+      style={{ borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-default)', backgroundColor: 'var(--color-bg-card)' }}
     >
       <div className="flex items-center justify-center w-12">{getRankIcon(entry.rank)}</div>
 
       <Avatar className="w-12 h-12">
         <AvatarImage src={entry.avatar_url || undefined} alt={entry.username} />
-        <AvatarFallback className="bg-primary/10 text-primary">
+        <AvatarFallback style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
           {entry.username.substring(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>
 
       <div className="flex-1">
-        <p className="font-semibold text-foreground">{entry.username}</p>
+        <p className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{entry.username}</p>
         {showBadges && (
           <div className="flex gap-2 mt-1">
             {entry.legendary_count > 0 && (
               <Badge
                 variant="outline"
-                className="text-xs bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50"
+                className="text-xs"
+                style={{ backgroundColor: 'var(--color-accent-light)', borderColor: 'var(--color-accent-border)', color: 'var(--color-accent)' }}
               >
                 <Crown className="w-3 h-3 mr-1" />
                 {entry.legendary_count} Legendary
@@ -184,7 +186,8 @@ export default function BadgeLeaderboard() {
             {entry.epic_count > 0 && (
               <Badge
                 variant="outline"
-                className="text-xs bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/30"
+                className="text-xs"
+                style={{ backgroundColor: 'var(--color-primary-light)', borderColor: 'var(--color-primary-border)', color: 'var(--color-primary)' }}
               >
                 {entry.epic_count} Epic
               </Badge>
@@ -194,11 +197,11 @@ export default function BadgeLeaderboard() {
       </div>
 
       <div className="text-right">
-        {showBadges && <p className="text-2xl font-bold text-primary">{entry.total_badges}</p>}
+        {showBadges && <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>{entry.total_badges}</p>}
         {showXp && (
           <div className="flex items-center gap-1">
-            <Zap className="w-4 h-4 text-yellow-500" />
-            <p className="text-2xl font-bold text-primary">{entry.total_xp.toLocaleString()}</p>
+            <Zap className="w-4 h-4" style={{ color: 'var(--color-warning)' }} />
+            <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>{entry.total_xp.toLocaleString()}</p>
           </div>
         )}
       </div>
@@ -207,8 +210,8 @@ export default function BadgeLeaderboard() {
 
   if (loading) {
     return (
-      <div className="container max-w-4xl mx-auto py-8 px-4">
-        <Card>
+      <div className="container max-w-4xl mx-auto py-8 px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader>
             <Skeleton className="h-8 w-48" />
             <Skeleton className="h-4 w-64 mt-2" />
@@ -226,13 +229,13 @@ export default function BadgeLeaderboard() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
+    <div className="container max-w-4xl mx-auto py-8 px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground flex items-center gap-3">
-          <Award className="w-10 h-10 text-primary" />
+        <h1 className="text-4xl font-bold flex items-center gap-3" style={{ color: 'var(--color-text-primary)' }}>
+          <Award className="w-10 h-10" style={{ color: 'var(--color-primary)' }} />
           Badge Leaderboard
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>
           Compete with others and climb the ranks by earning badges and XP
         </p>
       </div>
@@ -254,17 +257,17 @@ export default function BadgeLeaderboard() {
         </TabsList>
 
         <TabsContent value="total">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Total Badges Leaderboard</CardTitle>
-              <CardDescription>Users ranked by their total number of badges earned</CardDescription>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Total Badges Leaderboard</CardTitle>
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>Users ranked by their total number of badges earned</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {totalBadgesLeaderboard.length > 0 ? (
                   totalBadgesLeaderboard.map((entry) => renderLeaderboardEntry(entry, true, false))
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">No data available yet</p>
+                  <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>No data available yet</p>
                 )}
               </div>
             </CardContent>
@@ -272,10 +275,10 @@ export default function BadgeLeaderboard() {
         </TabsContent>
 
         <TabsContent value="legendary">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Legendary Badges Leaderboard</CardTitle>
-              <CardDescription>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Legendary Badges Leaderboard</CardTitle>
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>
                 Users ranked by their legendary and epic badge collection
               </CardDescription>
             </CardHeader>
@@ -284,7 +287,7 @@ export default function BadgeLeaderboard() {
                 {legendaryLeaderboard.length > 0 ? (
                   legendaryLeaderboard.map((entry) => renderLeaderboardEntry(entry, true, false))
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">No data available yet</p>
+                  <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>No data available yet</p>
                 )}
               </div>
             </CardContent>
@@ -292,17 +295,17 @@ export default function BadgeLeaderboard() {
         </TabsContent>
 
         <TabsContent value="xp">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Experience Points Leaderboard</CardTitle>
-              <CardDescription>Users ranked by their total XP accumulated</CardDescription>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Experience Points Leaderboard</CardTitle>
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>Users ranked by their total XP accumulated</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {xpLeaderboard.length > 0 ? (
                   xpLeaderboard.map((entry) => renderLeaderboardEntry(entry, false, true))
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">No data available yet</p>
+                  <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>No data available yet</p>
                 )}
               </div>
             </CardContent>

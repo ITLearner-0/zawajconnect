@@ -35,10 +35,10 @@ const verificationBadges = [
 ];
 
 const categoryLabels: Record<string, { label: string; color: string }> = {
-  character: { label: 'Caractère', color: 'bg-blue-100 text-blue-700' },
+  character: { label: 'Caractère', color: 'bg-sage-100 text-sage-700' },
   religiosity: { label: 'Religiosité', color: 'bg-emerald-100 text-emerald-700' },
-  family: { label: 'Famille', color: 'bg-purple-100 text-purple-700' },
-  professional: { label: 'Professionnel', color: 'bg-amber-100 text-amber-700' },
+  family: { label: 'Famille', color: 'bg-rose-100 text-rose-700' },
+  professional: { label: 'Professionnel', color: 'bg-gold-100 text-gold-700' },
 };
 
 const CommunityVerification = () => {
@@ -46,13 +46,13 @@ const CommunityVerification = () => {
   const trustScore = 78;
 
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl">
+    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 text-white mb-2">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 text-white mb-2">
           <ShieldCheck className="h-8 w-8" />
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
           Vérifié par la Communauté
         </h1>
         <p className="text-muted-foreground max-w-xl mx-auto">
@@ -61,23 +61,23 @@ const CommunityVerification = () => {
       </div>
 
       {/* Trust Score */}
-      <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <Card className="border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-sage-50">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
-              <div className="w-28 h-28 rounded-full border-8 border-blue-500 flex items-center justify-center bg-white">
+              <div className="w-28 h-28 rounded-full border-8 border-emerald-500 flex items-center justify-center bg-white">
                 <div className="text-center">
-                  <span className="text-3xl font-bold text-blue-600">{trustScore}</span>
-                  <span className="text-xs text-blue-600 block">/ 100</span>
+                  <span className="text-3xl font-bold text-emerald-600">{trustScore}</span>
+                  <span className="text-xs text-emerald-600 block">/ 100</span>
                 </div>
               </div>
-              <div className="absolute -top-1 -right-1 bg-blue-500 text-white rounded-full p-1">
+              <div className="absolute -top-1 -right-1 bg-emerald-500 text-white rounded-full p-1">
                 <ShieldCheck className="h-4 w-4" />
               </div>
             </div>
             <div className="text-center md:text-left flex-1">
-              <h2 className="text-xl font-bold text-blue-800">Score de confiance</h2>
-              <p className="text-blue-700 text-sm mt-1">
+              <h2 className="text-xl font-bold text-emerald-800">Score de confiance</h2>
+              <p className="text-emerald-700 text-sm mt-1">
                 Basé sur 4 témoignages vérifiés, l'attestation d'un imam et la vérification d'identité.
               </p>
               <Progress value={trustScore} className="h-2 mt-3" />
@@ -97,17 +97,17 @@ const CommunityVerification = () => {
             const Icon = badge.icon;
             return (
               <Card key={badge.name} className={`text-center transition-all ${
-                badge.earned ? 'border-blue-300 bg-blue-50' : 'opacity-50'
+                badge.earned ? 'border-emerald-300 bg-emerald-50' : 'opacity-50'
               }`}>
                 <CardContent className="pt-4 pb-4">
                   <div className={`w-12 h-12 rounded-full mx-auto flex items-center justify-center ${
-                    badge.earned ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'
+                    badge.earned ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'
                   }`}>
                     <Icon className="h-6 w-6" />
                   </div>
                   <p className="text-xs font-medium mt-2">{badge.name}</p>
                   {badge.earned && (
-                    <CheckCircle2 className="h-4 w-4 text-blue-500 mx-auto mt-1" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto mt-1" />
                   )}
                 </CardContent>
               </Card>
@@ -123,7 +123,7 @@ const CommunityVerification = () => {
           <Button
             variant="outline"
             size="sm"
-            className="border-blue-300 text-blue-600"
+            className="border-emerald-300 text-emerald-600"
             onClick={() => setShowRequestForm(!showRequestForm)}
           >
             <Users className="h-4 w-4 mr-1" /> Demander un témoignage
@@ -131,12 +131,12 @@ const CommunityVerification = () => {
         </div>
 
         {showRequestForm && (
-          <Card className="mb-4 border-blue-200 bg-blue-50/50">
+          <Card className="mb-4 border-emerald-200 bg-emerald-50/50">
             <CardContent className="pt-6 space-y-3">
               <p className="text-sm font-medium">Envoyer une demande de témoignage</p>
               <Textarea placeholder="Message personnalisé (optionnel) : 'Salam, pourriez-vous témoigner de mon caractère pour mon profil de mariage ?'" />
               <div className="flex gap-2">
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
                   Envoyer par email
                 </Button>
                 <Button size="sm" variant="outline">
@@ -152,14 +152,14 @@ const CommunityVerification = () => {
             <Card key={endorsement.id} className="hover:shadow-md transition-shadow">
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold flex-shrink-0">
                     {endorsement.authorName.charAt(0)}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">{endorsement.authorName}</span>
                       {endorsement.verified && (
-                        <Badge className="bg-blue-100 text-blue-700 text-xs">
+                        <Badge className="bg-emerald-100 text-emerald-700 text-xs">
                           <CheckCircle2 className="h-3 w-3 mr-1" /> Vérifié
                         </Badge>
                       )}
@@ -168,7 +168,7 @@ const CommunityVerification = () => {
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">{endorsement.authorRole}</p>
-                    <p className="text-sm mt-2 text-gray-700 leading-relaxed">"{endorsement.content}"</p>
+                    <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>"{endorsement.content}"</p>
                     <p className="text-xs text-muted-foreground mt-2">{endorsement.date}</p>
                   </div>
                 </div>
@@ -179,7 +179,7 @@ const CommunityVerification = () => {
       </div>
 
       {/* How it works */}
-      <Card className="border-dashed border-2 border-blue-200">
+      <Card className="border-dashed border-2 border-emerald-200">
         <CardContent className="pt-6">
           <h3 className="font-semibold text-center mb-4">Comment ça fonctionne ?</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -189,7 +189,7 @@ const CommunityVerification = () => {
               { step: '3', title: 'Confiance renforcée', desc: "Votre score de confiance augmente et les badges se débloquent" },
             ].map((s) => (
               <div key={s.step} className="text-center p-4">
-                <div className="w-10 h-10 rounded-full bg-blue-500 text-white font-bold flex items-center justify-center mx-auto mb-2">
+                <div className="w-10 h-10 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center mx-auto mb-2">
                   {s.step}
                 </div>
                 <p className="font-medium">{s.title}</p>

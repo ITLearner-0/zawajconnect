@@ -625,12 +625,12 @@ const Onboarding = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2 mb-8">
               <div className="flex justify-center">
-                <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+                <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
                   <User className="h-6 w-6 text-white" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold">Informations personnelles</h2>
-              <p className="text-muted-foreground">Parlez-nous un peu de vous</p>
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Informations personnelles</h2>
+              <p style={{ color: 'var(--color-text-muted)' }}>Parlez-nous un peu de vous</p>
               {tutorial.tutorialEnabled && (
                 <Button
                   variant="outline"
@@ -711,7 +711,7 @@ const Onboarding = () => {
               <div>
                 <Label htmlFor="location">Localisation *</Label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                   <Input
                     id="location"
                     value={profileData.location}
@@ -731,12 +731,12 @@ const Onboarding = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2 mb-8">
               <div className="flex justify-center">
-                <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+                <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
                   <User className="h-6 w-6 text-white" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold">Profil professionnel</h2>
-              <p className="text-muted-foreground">Votre parcours et personnalité</p>
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Profil professionnel</h2>
+              <p style={{ color: 'var(--color-text-muted)' }}>Votre parcours et personnalité</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -866,7 +866,7 @@ const Onboarding = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleSkipSection('interests')}
-                    className="text-muted-foreground"
+                    style={{ color: 'var(--color-text-muted)' }}
                   >
                     Je compléterai plus tard
                   </Button>
@@ -885,7 +885,7 @@ const Onboarding = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleSkipSection('photo')}
-                    className="text-muted-foreground"
+                    style={{ color: 'var(--color-text-muted)' }}
                   >
                     Je compléterai plus tard
                   </Button>
@@ -934,12 +934,12 @@ const Onboarding = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2 mb-8">
               <div className="flex justify-center">
-                <div className="h-12 w-12 bg-gradient-to-br from-gold to-gold-light rounded-full flex items-center justify-center">
+                <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-warning)' }}>
                   <Sparkles className="h-6 w-6 text-white" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold">Vos attentes</h2>
-              <p className="text-muted-foreground">Décrivez votre partenaire idéal</p>
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Vos attentes</h2>
+              <p style={{ color: 'var(--color-text-muted)' }}>Décrivez votre partenaire idéal</p>
             </div>
 
             <div>
@@ -974,13 +974,13 @@ const Onboarding = () => {
               </Select>
             </div>
 
-            <Card className="bg-emerald/5 border-emerald/20">
+            <Card style={{ backgroundColor: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)', borderRadius: 'var(--radius-lg)' }}>
               <CardContent className="p-4">
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-emerald mt-0.5" />
+                  <CheckCircle className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-success)' }} />
                   <div>
-                    <h4 className="font-medium text-emerald">Profil presque terminé !</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <h4 className="font-medium" style={{ color: 'var(--color-success)' }}>Profil presque terminé !</h4>
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
                       Une fois votre profil validé, vous pourrez découvrir des personnes compatibles
                       selon vos valeurs islamiques.
                     </p>
@@ -997,7 +997,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 islamic-pattern pb-24 md:pb-8">
+    <div className="min-h-screen islamic-pattern pb-24 md:pb-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Celebration Animation */}
       <ProgressCelebration
         message={tutorial.celebrationMessage}
@@ -1021,10 +1021,10 @@ const Onboarding = () => {
       {/* Tutorial Dismissal Banner */}
       {tutorial.tutorialEnabled && (
         <div className="fixed top-4 right-4 z-40 animate-fade-in">
-          <Card className="p-3 shadow-lg border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
+          <Card className="p-3 shadow-lg" style={{ backgroundColor: 'var(--color-bg-card)', border: '2px solid var(--color-primary-border)', borderRadius: 'var(--radius-md)' }}>
             <div className="flex items-center gap-3">
-              <Sparkles className="h-4 w-4 text-primary flex-shrink-0" />
-              <p className="text-sm font-medium">Mode tutoriel activé</p>
+              <Sparkles className="h-4 w-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Mode tutoriel activé</p>
               <Button
                 variant="ghost"
                 size="sm"
@@ -1055,22 +1055,23 @@ const Onboarding = () => {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-3xl font-bold text-foreground mb-2 gradient-text">
+            <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
               Créez votre profil ZawajConnect
             </h1>
-            <p className="text-muted-foreground">
+            <p style={{ color: 'var(--color-text-muted)' }}>
               Quelques informations pour trouver votre âme sœur
             </p>
 
             {/* Keyboard shortcut hint */}
             <button
               onClick={keyboardNav.toggleHelp}
-              className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors"
+              className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 text-xs rounded-full transition-colors"
+              style={{ color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-subtle)' }}
             >
               <Keyboard className="h-3 w-3" />
               <span>
                 Appuyez sur{' '}
-                <kbd className="px-1.5 py-0.5 bg-background border border-border rounded text-xs font-mono">
+                <kbd className="px-1.5 py-0.5 text-xs font-mono" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-sm)' }}>
                   ?
                 </kbd>{' '}
                 pour les raccourcis
@@ -1086,17 +1087,17 @@ const Onboarding = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Form */}
             <div className="lg:col-span-2">
-              <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm animate-slide-in-right card-hover">
+              <Card className="shadow-soft backdrop-blur-sm animate-slide-in-right card-hover" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-lg)' }}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center space-x-3">
-                      <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center text-white">
+                      <div className="h-10 w-10 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: 'var(--color-primary)' }}>
                         {steps[currentStep - 1]?.icon}
                       </div>
                       <span>{steps[currentStep - 1]?.title}</span>
                     </CardTitle>
                     <div className="text-right desktop-only">
-                      <div className="text-sm text-muted-foreground mb-2">
+                      <div className="text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>
                         Temps estimé: {steps[currentStep - 1]?.estimatedTime}
                       </div>
                       <SaveStatusIndicator
@@ -1118,7 +1119,7 @@ const Onboarding = () => {
                   />
 
                   {/* Desktop Navigation Buttons */}
-                  <div className="desktop-only flex justify-between pt-6 border-t border-border/50">
+                  <div className="desktop-only flex justify-between pt-6" style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
                     <Button
                       onClick={prevStep}
                       variant="outline"
@@ -1133,7 +1134,8 @@ const Onboarding = () => {
                       <Button
                         onClick={completeOnboarding}
                         disabled={loading || !isStepValid()}
-                        className="bg-gradient-to-r from-emerald to-emerald-dark hover:from-emerald-dark hover:to-emerald text-white flex items-center space-x-2"
+                        className="flex items-center space-x-2"
+                        style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                       >
                         {saving ? (
                           <>
@@ -1151,7 +1153,8 @@ const Onboarding = () => {
                       <Button
                         onClick={nextStep}
                         disabled={!isStepValid()}
-                        className="bg-emerald hover:bg-emerald-dark text-white flex items-center space-x-2"
+                        className="flex items-center space-x-2"
+                        style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                       >
                         <span>Suivant</span>
                         <ArrowRight className="h-4 w-4" />

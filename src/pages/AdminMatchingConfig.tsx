@@ -2,7 +2,7 @@ import AdminMatchingConfigPanel from '@/components/admin/matching/AdminMatchingC
 
 const AdminMatchingConfigPage = () => {
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <AdminMatchingConfigPanel />
     </div>
   );

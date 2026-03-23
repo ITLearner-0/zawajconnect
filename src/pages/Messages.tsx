@@ -223,10 +223,10 @@ const Messages = () => {
   // Loading state
   if (userLoading || isResolvingConversation) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
+      <div className="flex items-center justify-center h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600 dark:border-rose-300 mx-auto"></div>
-          <p className="mt-2 text-sm text-rose-600 dark:text-rose-300">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: 'var(--color-primary)' }}></div>
+          <p className="mt-2 text-sm" style={{ color: 'var(--color-primary)' }}>
             {isResolvingConversation ? 'Setting up conversation...' : 'Loading...'}
           </p>
         </div>
@@ -237,9 +237,9 @@ const Messages = () => {
   // Error state
   if (resolveError && !isResolvingConversation) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
+      <div className="flex items-center justify-center h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="text-center max-w-md p-6">
-          <div className="text-red-500 mb-4">
+          <div className="mb-4" style={{ color: 'var(--color-danger)' }}>
             <svg
               className="w-12 h-12 mx-auto"
               fill="none"
@@ -254,7 +254,7 @@ const Messages = () => {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
             Failed to Load Conversation
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{resolveError}</p>

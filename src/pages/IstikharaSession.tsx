@@ -193,54 +193,54 @@ const IstikharaSession = () => {
   // No active session — show intro
   if (!session) {
     return (
-      <div className="container mx-auto py-6 px-4 space-y-6 max-w-3xl">
+      <div className="container mx-auto py-6 px-4 space-y-6 max-w-3xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 text-white mb-2">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-2" style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>
             <Moon className="h-8 w-8" />
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
             Istikhara & Réflexion
           </h1>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+          <p className="max-w-xl mx-auto" style={{ color: 'var(--color-text-muted)' }}>
             7 jours de réflexion spirituelle guidée avant de prendre votre décision.
             Un journal privé, un hadith quotidien, et la prière d'Istikhara.
           </p>
         </div>
 
         {/* Dua Card */}
-        <Card className="border-indigo-200 bg-gradient-to-r from-indigo-50 to-purple-50">
+        <Card style={{ backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6 space-y-4">
-            <h3 className="font-semibold text-center">La prière de l'Istikhara</h3>
-            <div className="text-center p-4 bg-white rounded-xl border">
+            <h3 className="font-semibold text-center" style={{ color: 'var(--color-text-primary)' }}>La prière de l'Istikhara</h3>
+            <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
               <p className="text-lg text-right leading-loose font-arabic" dir="rtl">
                 {istikharaDua.arabic.substring(0, 100)}...
               </p>
-              <Button variant="link" className="text-indigo-600" onClick={() => setShowDuaDialog(true)}>
+              <Button variant="link" style={{ color: 'var(--color-primary)' }} onClick={() => setShowDuaDialog(true)}>
                 Lire le dua complet →
               </Button>
             </div>
             <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="p-3 rounded-lg bg-white/70">
-                <p className="text-2xl font-bold text-indigo-600">7</p>
-                <p className="text-xs text-muted-foreground">jours de réflexion</p>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-card)', borderRadius: 'var(--radius-md)' }}>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>7</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>jours de réflexion</p>
               </div>
-              <div className="p-3 rounded-lg bg-white/70">
-                <p className="text-2xl font-bold text-indigo-600">7</p>
-                <p className="text-xs text-muted-foreground">hadiths du mariage</p>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-card)', borderRadius: 'var(--radius-md)' }}>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>7</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>hadiths du mariage</p>
               </div>
-              <div className="p-3 rounded-lg bg-white/70">
-                <p className="text-2xl font-bold text-indigo-600">🔒</p>
-                <p className="text-xs text-muted-foreground">journal 100% privé</p>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-card)', borderRadius: 'var(--radius-md)' }}>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>🔒</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>journal 100% privé</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-amber-200 bg-amber-50">
+        <Card style={{ backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning-border)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6">
             <div className="flex gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0" />
-              <div className="text-sm text-amber-800">
+              <AlertCircle className="h-5 w-5 flex-shrink-0" style={{ color: 'var(--color-warning)' }} />
+              <div className="text-sm" style={{ color: 'var(--color-text-primary)' }}>
                 <p className="font-medium">Comment ça fonctionne :</p>
                 <ul className="mt-1 space-y-1">
                   <li>• Priez 2 rak'at surérogatoires puis récitez le dua de l'Istikhara chaque jour</li>
@@ -253,7 +253,7 @@ const IstikharaSession = () => {
           </CardContent>
         </Card>
 
-        <Button className="w-full h-12 text-lg bg-indigo-600 hover:bg-indigo-700" onClick={startNewSession}>
+        <Button className="w-full h-12 text-lg" style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }} onClick={startNewSession}>
           <Moon className="h-5 w-5 mr-2" /> Commencer ma période de réflexion
         </Button>
 
@@ -264,18 +264,18 @@ const IstikharaSession = () => {
               <DialogTitle>Dua de l'Istikhara</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="p-4 bg-indigo-50 rounded-lg">
+              <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-primary-light)', borderRadius: 'var(--radius-md)' }}>
                 <p className="text-lg text-right leading-loose" dir="rtl">{istikharaDua.arabic}</p>
               </div>
               <div>
                 <p className="text-sm font-medium mb-1">Translittération :</p>
-                <p className="text-sm text-muted-foreground italic">{istikharaDua.transliteration}</p>
+                <p className="text-sm italic" style={{ color: 'var(--color-text-muted)' }}>{istikharaDua.transliteration}</p>
               </div>
               <div>
                 <p className="text-sm font-medium mb-1">Traduction :</p>
-                <p className="text-sm text-gray-700">{istikharaDua.french}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{istikharaDua.french}</p>
               </div>
-              <p className="text-xs text-muted-foreground">Source : {istikharaDua.source}</p>
+              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Source : {istikharaDua.source}</p>
             </div>
           </DialogContent>
         </Dialog>
@@ -285,10 +285,10 @@ const IstikharaSession = () => {
 
   // Active session
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6 max-w-3xl">
+    <div className="container mx-auto py-6 px-4 space-y-6 max-w-3xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
           Istikhara — Jour {currentDay}/7
         </h1>
         <Progress value={(currentDay / 7) * 100} className="h-2.5 max-w-xs mx-auto" />
@@ -306,11 +306,14 @@ const IstikharaSession = () => {
               key={dayNum}
               variant={activeDay === dayNum ? 'default' : 'outline'}
               size="sm"
-              className={`flex-shrink-0 ${
-                activeDay === dayNum ? 'bg-indigo-600 hover:bg-indigo-700' :
-                hasEntry ? 'border-emerald-300 text-emerald-600' :
-                !isAccessible ? 'opacity-40' : ''
-              }`}
+              className={`flex-shrink-0 ${!isAccessible ? 'opacity-40' : ''}`}
+              style={
+                activeDay === dayNum
+                  ? { backgroundColor: 'var(--color-primary)', color: '#fff' }
+                  : hasEntry
+                  ? { borderColor: 'var(--color-success-border)', color: 'var(--color-success)' }
+                  : {}
+              }
               disabled={!isAccessible}
               onClick={() => {
                 setActiveDay(dayNum);
@@ -327,49 +330,49 @@ const IstikharaSession = () => {
       </div>
 
       {/* Hadith du jour */}
-      <Card className="border-indigo-200 bg-gradient-to-r from-indigo-50 to-purple-50">
+      <Card style={{ backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)', borderRadius: 'var(--radius-lg)' }}>
         <CardContent className="pt-6">
           <div className="flex items-start gap-3">
-            <BookOpen className="h-5 w-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+            <BookOpen className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }} />
             <div>
-              <p className="text-xs font-medium text-indigo-600 mb-2">Hadith du jour {activeDay}</p>
+              <p className="text-xs font-medium mb-2" style={{ color: 'var(--color-primary)' }}>Hadith du jour {activeDay}</p>
               <p className="text-right text-lg leading-loose mb-2" dir="rtl">
                 {dayContent.hadith.arabic}
               </p>
-              <p className="text-sm text-gray-700 italic">"{dayContent.hadith.french}"</p>
-              <p className="text-xs text-muted-foreground mt-1">— {dayContent.hadith.source}</p>
+              <p className="text-sm italic" style={{ color: 'var(--color-text-secondary)' }}>"{dayContent.hadith.french}"</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>— {dayContent.hadith.source}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Reflection Question */}
-      <Card>
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <CardContent className="pt-6">
           <div className="flex items-start gap-3">
-            <Sparkles className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <Sparkles className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-warning)' }} />
             <div>
-              <p className="text-xs font-medium text-amber-600 mb-1">Réflexion du jour</p>
-              <p className="text-sm text-gray-700">{dayContent.reflection}</p>
+              <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-warning)' }}>Réflexion du jour</p>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{dayContent.reflection}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Daily Advice */}
-      <Card className="border-emerald-200 bg-emerald-50/50">
+      <Card style={{ backgroundColor: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)', borderRadius: 'var(--radius-lg)' }}>
         <CardContent className="pt-4 pb-4">
-          <p className="text-sm text-emerald-800">
+          <p className="text-sm" style={{ color: 'var(--color-success)' }}>
             <span className="font-medium">💡 Conseil :</span> {dayContent.advice}
           </p>
         </CardContent>
       </Card>
 
       {/* Journal Entry */}
-      <Card>
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <PenLine className="h-5 w-5 text-indigo-500" />
+            <PenLine className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
             Journal privé — Jour {activeDay}
             <Badge variant="outline" className="ml-auto text-xs">
               🔒 Strictement privé
@@ -404,8 +407,8 @@ const IstikharaSession = () => {
           />
 
           {dayEntry && !journalText && (
-            <div className="p-3 rounded-lg bg-gray-50 border">
-              <p className="text-xs text-muted-foreground mb-1">Votre entrée sauvegardée :</p>
+            <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)' }}>
+              <p className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Votre entrée sauvegardée :</p>
               <p className="text-sm">{dayEntry.content}</p>
               <Badge className={`mt-2 text-xs ${moodLabels[dayEntry.mood]?.color || ''}`}>
                 {moodLabels[dayEntry.mood]?.emoji} {moodLabels[dayEntry.mood]?.label}
@@ -416,7 +419,8 @@ const IstikharaSession = () => {
           <Button
             onClick={saveJournalEntry}
             disabled={!journalText.trim()}
-            className="w-full bg-indigo-600 hover:bg-indigo-700"
+            className="w-full"
+            style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
           >
             <PenLine className="h-4 w-4 mr-2" /> Sauvegarder le journal du jour {activeDay}
           </Button>
@@ -425,15 +429,15 @@ const IstikharaSession = () => {
 
       {/* Decision Button (Day 7) */}
       {currentDay >= 7 && (
-        <Card className="border-2 border-indigo-300 bg-gradient-to-r from-indigo-50 to-purple-50">
+        <Card style={{ backgroundColor: 'var(--color-primary-light)', border: '2px solid var(--color-primary-border)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6 text-center space-y-3">
-            <Sparkles className="h-8 w-8 text-indigo-500 mx-auto" />
+            <Sparkles className="h-8 w-8 mx-auto" style={{ color: 'var(--color-primary)' }} />
             <h3 className="font-semibold text-lg">Votre période de réflexion est terminée</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
               Après 7 jours de prière et de réflexion, êtes-vous prêt(e) à prendre votre décision ?
             </p>
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700"
+              style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
               onClick={() => setShowDecisionDialog(true)}
             >
               Je suis prêt(e) à décider
@@ -448,13 +452,14 @@ const IstikharaSession = () => {
           <DialogHeader>
             <DialogTitle>Votre décision</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Après 7 jours de prière d'Istikhara et de réflexion, quelle est votre décision ?
             Cette décision est entre vous et Allah. Prenez-la en toute sérénité.
           </p>
           <DialogFooter className="flex gap-3 sm:gap-3">
             <Button
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+              className="flex-1"
+              style={{ backgroundColor: 'var(--color-success)', color: '#fff', borderRadius: 'var(--radius-md)' }}
               onClick={() => handleDecision('yes')}
             >
               <Heart className="h-4 w-4 mr-2" /> Oui, je souhaite poursuivre

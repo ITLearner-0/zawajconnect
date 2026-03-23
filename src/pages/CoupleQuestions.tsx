@@ -54,7 +54,7 @@ const CoupleQuestions = () => {
     const Icon = iconMap[category.icon] || Heart;
 
     return (
-      <div className="container mx-auto py-6 px-4 space-y-6 max-w-3xl">
+      <div className="container mx-auto py-6 px-4 space-y-6 max-w-3xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <Button variant="ghost" onClick={() => setSelectedCategory(null)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> Retour aux catégories
         </Button>
@@ -94,31 +94,31 @@ const CoupleQuestions = () => {
   }
 
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl">
+    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 text-white mb-2">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full text-white mb-2" style={{ backgroundColor: 'var(--color-primary)' }}>
           <Sparkles className="h-8 w-8" />
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
           Questions du Couple
         </h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">
+        <p style={{ color: 'var(--color-text-muted)' }} className="max-w-xl mx-auto">
           100 questions essentielles avant le mariage. Répondez chacun de votre côté,
           les réponses ne se révèlent que quand les deux ont répondu.
         </p>
       </div>
 
       {/* Overall Progress */}
-      <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
+      <Card style={{ backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)', borderRadius: 'var(--radius-lg)' }}>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-medium">Progression globale</span>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
+            <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Progression globale</span>
+            <Badge variant="secondary" style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}>
               {totalAnswered}/100 questions
             </Badge>
           </div>
           <Progress value={totalProgress} className="h-3" />
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-sm mt-2" style={{ color: 'var(--color-text-muted)' }}>
             {totalProgress < 25 && "Commencez votre parcours de découverte mutuelle !"}
             {totalProgress >= 25 && totalProgress < 50 && "Beau début ! Continuez à explorer vos compatibilités."}
             {totalProgress >= 50 && totalProgress < 75 && "Plus de la moitié ! Vous vous connaissez de mieux en mieux."}
@@ -138,7 +138,8 @@ const CoupleQuestions = () => {
           return (
             <Card
               key={category.id}
-              className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-emerald-300"
+              className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+              style={{ backgroundColor: 'var(--color-bg-card)', border: '2px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}
               onClick={() => setSelectedCategory(category.id)}
             >
               <CardContent className="pt-6">
@@ -148,21 +149,21 @@ const CoupleQuestions = () => {
                       <Icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{category.name}</h3>
-                      <p className="text-sm text-muted-foreground">{category.description}</p>
+                      <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{category.name}</h3>
+                      <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{category.description}</p>
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground mt-1" />
+                  <ChevronRight className="h-5 w-5 mt-1" style={{ color: 'var(--color-text-muted)' }} />
                 </div>
                 <div className="mt-4">
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-muted-foreground">{answered}/10 questions</span>
-                    <span className="font-medium">{progress}%</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>{answered}/10 questions</span>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{progress}%</span>
                   </div>
                   <Progress value={progress} className="h-2" />
                 </div>
                 {progress === 100 && (
-                  <Badge className="mt-3 bg-emerald-100 text-emerald-700 hover:bg-emerald-200">
+                  <Badge className="mt-3" style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}>
                     <CheckCircle2 className="h-3 w-3 mr-1" /> Complété
                   </Badge>
                 )}
@@ -194,30 +195,31 @@ const QuestionItem = ({
   const partnerAnswered = Math.random() > 0.5; // Mock
 
   return (
-    <Card className={`transition-all duration-300 ${isAnswered ? 'border-emerald-300 bg-emerald-50/50' : ''}`}>
+    <Card className="transition-all duration-300" style={isAnswered ? { backgroundColor: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)', borderRadius: 'var(--radius-lg)' } : { backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
       <CardHeader className="cursor-pointer pb-3" onClick={onToggle}>
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-              isAnswered ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-600'
-            }`}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{
+              backgroundColor: isAnswered ? 'var(--color-primary)' : 'var(--color-bg-subtle)',
+              color: isAnswered ? '#fff' : 'var(--color-text-muted)'
+            }}>
               {isAnswered ? <CheckCircle2 className="h-4 w-4" /> : index + 1}
             </div>
             <div>
-              <CardTitle className="text-base leading-relaxed">{question.question}</CardTitle>
+              <CardTitle className="text-base leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>{question.question}</CardTitle>
               {isAnswered && !isActive && (
-                <p className="text-sm text-emerald-600 mt-1">Votre réponse : {answer}</p>
+                <p className="text-sm mt-1" style={{ color: 'var(--color-primary)' }}>Votre réponse : {answer}</p>
               )}
             </div>
           </div>
           <div className="flex gap-2">
             {isAnswered && (
-              <Badge variant="outline" className="border-emerald-300 text-emerald-600">
+              <Badge variant="outline" style={{ borderColor: 'var(--color-success-border)', color: 'var(--color-success)' }}>
                 <CheckCircle2 className="h-3 w-3 mr-1" /> Répondu
               </Badge>
             )}
             {isAnswered && !partnerAnswered && (
-              <Badge variant="outline" className="border-amber-300 text-amber-600">
+              <Badge variant="outline" style={{ borderColor: 'var(--color-warning-border)', color: 'var(--color-warning)' }}>
                 <Lock className="h-3 w-3 mr-1" /> En attente
               </Badge>
             )}
@@ -233,9 +235,8 @@ const QuestionItem = ({
                 <Button
                   key={option}
                   variant={answer === option ? 'default' : 'outline'}
-                  className={`justify-start h-auto py-3 px-4 text-left ${
-                    answer === option ? 'bg-emerald-600 hover:bg-emerald-700' : ''
-                  }`}
+                  className="justify-start h-auto py-3 px-4 text-left"
+                  style={answer === option ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' } : { borderRadius: 'var(--radius-md)' }}
                   onClick={() => onAnswer(option)}
                 >
                   {option}
@@ -255,7 +256,7 @@ const QuestionItem = ({
               />
               <Button
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-700"
+                style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                 onClick={(e) => {
                   const textarea = (e.target as HTMLElement).closest('.space-y-2')?.querySelector('textarea');
                   if (textarea?.value) onAnswer(textarea.value);
@@ -267,15 +268,15 @@ const QuestionItem = ({
           )}
 
           {isAnswered && partnerAnswered && (
-            <Card className="border-blue-200 bg-blue-50">
+            <Card style={{ backgroundColor: 'var(--color-accent-light)', border: '1px solid var(--color-accent-border)', borderRadius: 'var(--radius-lg)' }}>
               <CardContent className="pt-4">
-                <p className="text-sm font-medium text-blue-800 mb-1">Réponse du partenaire :</p>
-                <p className="text-sm text-blue-700">
+                <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>Réponse du partenaire :</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {question.type === 'choice' && question.options
                     ? question.options[Math.floor(Math.random() * question.options.length)]
                     : "Réponse similaire à la vôtre, masha'Allah !"}
                 </p>
-                <Badge className="mt-2 bg-emerald-100 text-emerald-700">
+                <Badge className="mt-2" style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}>
                   <Sparkles className="h-3 w-3 mr-1" /> Compatible
                 </Badge>
               </CardContent>

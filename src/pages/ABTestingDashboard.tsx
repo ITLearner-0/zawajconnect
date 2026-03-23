@@ -74,10 +74,10 @@ export default function ABTestingDashboard() {
     : '0.00';
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Tests A/B des Emails de Rappel</h1>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Tests A/B des Emails de Rappel</h1>
           <p className="text-muted-foreground mt-2">
             Optimisez vos emails de renouvellement avec des tests A/B automatisés
           </p>
@@ -108,7 +108,7 @@ export default function ABTestingDashboard() {
 
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-2">
-            <Eye className="h-5 w-5 text-blue-500" />
+            <Eye className="h-5 w-5 text-emerald-500" />
             <span className="text-sm font-medium text-muted-foreground">Taux d'Ouverture</span>
           </div>
           <div className="text-3xl font-bold">{avgOpenRate}%</div>
@@ -119,7 +119,7 @@ export default function ABTestingDashboard() {
 
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-2">
-            <MousePointerClick className="h-5 w-5 text-green-500" />
+            <MousePointerClick className="h-5 w-5 text-emerald-600" />
             <span className="text-sm font-medium text-muted-foreground">Taux de Clic</span>
           </div>
           <div className="text-3xl font-bold">{avgClickRate}%</div>
@@ -130,7 +130,7 @@ export default function ABTestingDashboard() {
 
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-5 w-5 text-orange-500" />
+            <TrendingUp className="h-5 w-5 text-gold-500" />
             <span className="text-sm font-medium text-muted-foreground">Taux de Conversion</span>
           </div>
           <div className="text-3xl font-bold">{avgConversionRate}%</div>
@@ -141,7 +141,7 @@ export default function ABTestingDashboard() {
 
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="h-5 w-5 text-yellow-500" />
+            <DollarSign className="h-5 w-5 text-gold-600" />
             <span className="text-sm font-medium text-muted-foreground">Revenus Générés</span>
           </div>
           <div className="text-3xl font-bold">{summaryStats?.totalRevenue.toFixed(0) || 0}€</div>

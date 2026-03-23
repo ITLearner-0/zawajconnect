@@ -23,30 +23,38 @@ interface MatchCardProps {
   onStartChat: (matchId: string) => void;
 }
 
-/** Color for match score badge */
-function matchScoreColor(score: number) {
-  if (score >= 80) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-  if (score >= 60) return 'bg-amber-100 text-amber-700 border-amber-200';
-  return 'bg-gray-100 text-gray-600 border-gray-200';
-}
-
 export const MatchCard = ({ match, statusBadge, onViewProfile, onStartChat }: MatchCardProps) => {
   const verificationScore = match.verification_score ?? 0;
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card
+      className="hover:shadow-md transition-shadow"
+      style={{
+        background: 'var(--color-bg-card)',
+        border: '1px solid var(--color-border-default)',
+        borderRadius: '16px',
+      }}
+    >
       <CardContent className="p-4">
         <div className="flex items-start gap-4">
           {/* Avatar */}
           <div className="relative h-16 w-16 flex-shrink-0">
-            <div className="h-16 w-16 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-              <span className="text-lg text-primary-foreground font-bold">
+            <div
+              className="h-16 w-16 rounded-full flex items-center justify-center"
+              style={{ background: 'var(--color-primary)' }}
+            >
+              <span className="text-lg font-bold text-white">
                 {match.other_user?.full_name?.charAt(0) || '?'}
               </span>
             </div>
             {/* Match score ring overlay */}
             <div
-              className={`absolute -bottom-1 -right-1 h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold border ${matchScoreColor(match.match_score)}`}
+              className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold"
+              style={{
+                background: 'var(--color-primary-light)',
+                color: 'var(--color-primary)',
+                border: '1px solid var(--color-primary-border)',
+              }}
             >
               {match.match_score}
             </div>
@@ -56,8 +64,15 @@ export const MatchCard = ({ match, statusBadge, onViewProfile, onStartChat }: Ma
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2 mb-1">
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-base truncate">{match.other_user?.full_name}</h3>
-                <p className="text-sm text-muted-foreground">{match.other_user?.age} ans</p>
+                <h3
+                  className="font-semibold text-base truncate"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
+                  {match.other_user?.full_name}
+                </h3>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  {match.other_user?.age} ans
+                </p>
               </div>
               {statusBadge}
             </div>
@@ -65,14 +80,14 @@ export const MatchCard = ({ match, statusBadge, onViewProfile, onStartChat }: Ma
             {/* Details */}
             <div className="space-y-1 mb-2">
               {match.other_user?.location && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   <MapPin className="h-3 w-3 flex-shrink-0" />
                   <span className="truncate">{match.other_user.location}</span>
                 </div>
               )}
 
               {match.other_user?.profession && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   <Briefcase className="h-3 w-3 flex-shrink-0" />
                   <span className="truncate">{match.other_user.profession}</span>
                 </div>
@@ -81,36 +96,32 @@ export const MatchCard = ({ match, statusBadge, onViewProfile, onStartChat }: Ma
 
             {/* Compatibility bar + Trust score */}
             <div className="flex items-center gap-3 mb-2">
-              {/* Compatibility bar */}
-              <div className="flex items-center gap-1.5 flex-1">
-                <Percent className="h-3 w-3 text-emerald-500 flex-shrink-0" />
-                <div className="flex-1 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${
-                      match.match_score >= 80
-                        ? 'bg-emerald-500'
-                        : match.match_score >= 60
-                          ? 'bg-amber-500'
-                          : 'bg-gray-400'
-                    }`}
-                    style={{ width: `${Math.min(match.match_score, 100)}%` }}
-                  />
-                </div>
-              </div>
+              {/* Compatibility badge */}
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
+                style={{
+                  background: 'var(--color-primary-light)',
+                  color: 'var(--color-primary)',
+                }}
+              >
+                <Percent className="h-3 w-3 flex-shrink-0" />
+                {match.match_score}%
+              </span>
 
               {/* Trust mini badge */}
               {verificationScore > 0 && (
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <ShieldCheck
-                    className={`h-3 w-3 ${
-                      verificationScore >= 75
-                        ? 'text-emerald-500'
+                    className="h-3 w-3"
+                    style={{
+                      color: verificationScore >= 75
+                        ? 'var(--color-success)'
                         : verificationScore >= 50
-                          ? 'text-amber-500'
-                          : 'text-gray-400'
-                    }`}
+                          ? 'var(--color-warning)'
+                          : 'var(--color-text-muted)',
+                    }}
                   />
-                  <span className="text-[10px] text-muted-foreground font-medium">
+                  <span className="text-[10px] font-medium" style={{ color: 'var(--color-text-muted)' }}>
                     {verificationScore}%
                   </span>
                 </div>
@@ -118,7 +129,7 @@ export const MatchCard = ({ match, statusBadge, onViewProfile, onStartChat }: Ma
             </div>
 
             {/* Date */}
-            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
+            <div className="flex items-center gap-1 text-xs mb-3" style={{ color: 'var(--color-text-muted)' }}>
               <Calendar className="h-3 w-3 flex-shrink-0" />
               <span>
                 {new Date(match.created_at).toLocaleDateString('fr-FR', {
@@ -135,19 +146,26 @@ export const MatchCard = ({ match, statusBadge, onViewProfile, onStartChat }: Ma
                 size="sm"
                 onClick={() => onViewProfile(match.other_user.user_id)}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 rounded-xl"
+                style={{
+                  border: '1px solid var(--color-border-default)',
+                  color: 'var(--color-text-secondary)',
+                }}
               >
                 <Eye className="h-3 w-3 mr-1" />
-                Profil
+                Voir profil
               </Button>
               <Button
                 size="sm"
                 onClick={() => onStartChat(match.id)}
                 disabled={match.conversation_status === 'ended'}
-                className="flex-1 bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                className="flex-1 text-sm rounded-xl text-white"
+                style={{
+                  background: 'var(--color-primary)',
+                }}
               >
                 <MessageCircle className="h-3 w-3 mr-1" />
-                Message
+                Envoyer un message
               </Button>
             </div>
           </div>

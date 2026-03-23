@@ -11,19 +11,19 @@ import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <Hero />
       <IslamicValues />
       <ProcessSection />
       <CompatibilitySection />
-      <section className="py-12 px-4 bg-gradient-to-br from-emerald/5 via-cream/20 to-sage/10">
+      <section className="py-12 px-4" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
         <div className="container mx-auto">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-10 animate-fade-in">
-              <h2 className="text-3xl font-bold text-foreground mb-4">
+              <h2 className="text-3xl font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                 Outils Islamiques du Quotidien
               </h2>
-              <p className="text-muted-foreground">
+              <p style={{ color: 'var(--color-text-secondary)' }}>
                 Restez connecté à votre foi pendant votre recherche du partenaire idéal
               </p>
             </div>

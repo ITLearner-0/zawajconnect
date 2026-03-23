@@ -96,25 +96,25 @@ const Guidance = () => {
     return labels[category as keyof typeof labels] || category;
   };
 
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      marriage_prep: 'bg-emerald/10 text-emerald border-emerald/20',
-      islamic_values: 'bg-gold/10 text-gold-dark border-gold/20',
-      family_life: 'bg-blue/10 text-blue-dark border-blue/20',
-      courtship_etiquette: 'bg-purple/10 text-purple-dark border-purple/20',
-      wedding_planning: 'bg-pink/10 text-pink-dark border-pink/20',
+  const getCategoryStyle = (category: string): React.CSSProperties => {
+    const styles: Record<string, React.CSSProperties> = {
+      marriage_prep: { backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)', borderColor: 'var(--color-success-border)' },
+      islamic_values: { backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)', borderColor: 'var(--color-warning-border)' },
+      family_life: { backgroundColor: 'var(--color-info-bg)', color: 'var(--color-info)', borderColor: 'var(--color-info-border)' },
+      courtship_etiquette: { backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', borderColor: 'var(--color-primary-border)' },
+      wedding_planning: { backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderColor: 'var(--color-danger-border)' },
     };
-    return colors[category as keyof typeof colors] || 'bg-muted';
+    return styles[category] || { backgroundColor: 'var(--color-bg-subtle)' };
   };
 
   if (loading) {
     return (
-      <div className="py-8 px-4">
+      <div className="py-8 px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="container mx-auto">
           <div className="max-w-6xl mx-auto">
             <div className="text-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Chargement des articles...</p>
+              <div className="h-8 w-8 animate-spin rounded-full mx-auto mb-4" style={{ border: '4px solid var(--color-primary-muted)', borderTopColor: 'var(--color-primary)' }}></div>
+              <p style={{ color: 'var(--color-text-muted)' }}>Chargement des articles...</p>
             </div>
           </div>
         </div>
@@ -123,28 +123,28 @@ const Guidance = () => {
   }
 
   return (
-    <div className="py-8 px-4">
+    <div className="py-8 px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
-            <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-              <BookOpen className="h-6 w-6 text-primary-foreground" />
+            <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>
+              <BookOpen className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Guide islamique</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Guide islamique</h1>
+              <p style={{ color: 'var(--color-text-muted)' }}>
                 Conseils et guidance pour un mariage islamique réussi
               </p>
             </div>
           </div>
 
           {/* Filters */}
-          <Card className="mb-8">
+          <Card className="mb-8" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                     <Input
                       placeholder="Rechercher des articles..."
                       value={searchTerm}
@@ -175,8 +175,8 @@ const Guidance = () => {
           {/* Featured Articles */}
           {articles.some((article) => article.featured) && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <Star className="h-6 w-6 text-gold" />
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
+                <Star className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
                 Articles en vedette
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -186,13 +186,14 @@ const Guidance = () => {
                   .map((article) => (
                     <Card
                       key={article.id}
-                      className="hover:shadow-lg transition-all duration-300 animate-fade-in"
+                      className="transition-all duration-300 animate-fade-in"
+                      style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}
                     >
                       <CardHeader>
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
                             <CardTitle className="text-xl mb-2">{article.title}</CardTitle>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>
                               <div className="flex items-center gap-1">
                                 <User className="h-4 w-4" />
                                 <span>{article.author}</span>
@@ -207,13 +208,13 @@ const Guidance = () => {
                               </div>
                             </div>
                           </div>
-                          <Badge className={getCategoryColor(article.category)}>
+                          <Badge style={getCategoryStyle(article.category)}>
                             {getCategoryLabel(article.category)}
                           </Badge>
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground line-clamp-4">{article.content}</p>
+                        <p className="line-clamp-4" style={{ color: 'var(--color-text-muted)' }}>{article.content}</p>
                       </CardContent>
                     </Card>
                   ))}
@@ -223,7 +224,7 @@ const Guidance = () => {
 
           {/* All Articles */}
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
               Tous les articles ({filteredArticles.length})
             </h2>
 
@@ -232,7 +233,8 @@ const Guidance = () => {
                 {filteredArticles.map((article) => (
                   <Card
                     key={article.id}
-                    className="hover:shadow-lg transition-all duration-300 animate-fade-in"
+                    className="transition-all duration-300 animate-fade-in"
+                    style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}
                   >
                     <CardHeader>
                       <div className="flex items-start justify-between gap-4">
@@ -240,10 +242,10 @@ const Guidance = () => {
                           <CardTitle className="text-xl mb-2 flex items-center gap-2">
                             {article.title}
                             {article.featured && (
-                              <Star className="h-4 w-4 text-gold fill-current" />
+                              <Star className="h-4 w-4 fill-current" style={{ color: 'var(--color-warning)' }} />
                             )}
                           </CardTitle>
-                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>
                             <div className="flex items-center gap-1">
                               <User className="h-4 w-4" />
                               <span>{article.author}</span>
@@ -258,25 +260,25 @@ const Guidance = () => {
                             </div>
                           </div>
                         </div>
-                        <Badge className={getCategoryColor(article.category)}>
+                        <Badge style={getCategoryStyle(article.category)}>
                           {getCategoryLabel(article.category)}
                         </Badge>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">{article.content}</p>
+                      <p style={{ color: 'var(--color-text-muted)' }}>{article.content}</p>
                     </CardContent>
                   </Card>
                 ))}
               </div>
             ) : (
-              <Card>
+              <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
                 <CardContent className="text-center py-12">
-                  <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                    <BookOpen className="h-8 w-8 text-muted-foreground" />
+                  <div className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
+                    <BookOpen className="h-8 w-8" style={{ color: 'var(--color-text-muted)' }} />
                   </div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Aucun article trouvé</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Aucun article trouvé</h3>
+                  <p style={{ color: 'var(--color-text-muted)' }}>
                     Essayez de modifier vos critères de recherche ou parcourez toutes les catégories
                   </p>
                 </CardContent>

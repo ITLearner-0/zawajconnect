@@ -162,11 +162,11 @@ export default function Favorites() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-center items-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-12 w-12" style={{ borderBottom: '2px solid var(--color-primary)' }}></div>
           </div>
         </div>
       </div>
@@ -174,16 +174,16 @@ export default function Favorites() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <Button variant="outline" onClick={() => navigate('/notes')} className="mb-4">
+          <Button variant="outline" onClick={() => navigate('/notes')} className="mb-4" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}>
             <StickyNote className="h-4 w-4 mr-2" />
             Gérer mes notes
           </Button>
 
-          <Button variant="outline" onClick={() => navigate('/browse')} className="mb-4 ml-2">
+          <Button variant="outline" onClick={() => navigate('/browse')} className="mb-4 ml-2" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à la recherche
           </Button>
@@ -191,10 +191,10 @@ export default function Favorites() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Heart className="h-8 w-8 text-yellow-500 fill-yellow-500" />
-                <h1 className="text-3xl font-bold">Mes Favoris</h1>
+                <Heart className="h-8 w-8" style={{ color: 'var(--color-warning)', fill: 'var(--color-warning)' }} />
+                <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Mes Favoris</h1>
               </div>
-              <p className="text-muted-foreground">
+              <p style={{ color: 'var(--color-text-muted)' }}>
                 {filteredProfiles.length} profil{filteredProfiles.length > 1 ? 's' : ''}
                 {selectedTagFilter
                   ? ' avec ce tag'
@@ -226,7 +226,8 @@ export default function Favorites() {
                       size="sm"
                       onClick={handleExportAll}
                       disabled={isExporting}
-                      className="gap-2 bg-emerald text-white hover:bg-emerald/90"
+                      className="gap-2"
+                      style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                     >
                       <FileDown className="h-4 w-4" />
                       {isExporting ? 'Export...' : `Tout exporter (${filteredProfiles.length})`}
@@ -239,7 +240,8 @@ export default function Favorites() {
                       size="sm"
                       onClick={handleExportMultiple}
                       disabled={isExporting}
-                      className="gap-2 bg-gold text-white hover:bg-gold/90"
+                      className="gap-2"
+                      style={{ backgroundColor: 'var(--color-warning)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                     >
                       <FileDown className="h-4 w-4" />
                       {isExporting ? 'Export...' : `Exporter (${selectedProfiles.size})`}
@@ -251,14 +253,14 @@ export default function Favorites() {
           </div>
 
           {selectionMode && filteredProfiles.length > 0 && (
-            <Card className="p-3 mb-4 bg-emerald/5 border-emerald/20">
+            <Card className="p-3 mb-4" style={{ backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)', borderRadius: 'var(--radius-md)' }}>
               <div className="flex items-center gap-3">
                 <Checkbox
                   checked={selectedProfiles.size === filteredProfiles.length}
                   onCheckedChange={toggleSelectAll}
                   id="select-all"
                 />
-                <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                <label htmlFor="select-all" className="text-sm font-medium cursor-pointer" style={{ color: 'var(--color-text-primary)' }}>
                   Tout sélectionner ({selectedProfiles.size}/{filteredProfiles.length})
                 </label>
               </div>
@@ -267,10 +269,10 @@ export default function Favorites() {
 
           {/* Tag Filters */}
           {tags.length > 0 && (
-            <Card className="p-4 mb-6">
+            <Card className="p-4 mb-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
               <div className="flex items-center gap-2 mb-3">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Filtrer par tag :</span>
+                <Filter className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Filtrer par tag :</span>
                 {selectedTagFilter && (
                   <Button
                     size="sm"
@@ -307,11 +309,11 @@ export default function Favorites() {
 
         {filteredProfiles.length === 0 ? (
           <div className="text-center py-16">
-            <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-2">
+            <Heart className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
+            <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
               {selectedTagFilter ? 'Aucun favori avec ce tag' : 'Aucun favori'}
             </h2>
-            <p className="text-muted-foreground mb-6">
+            <p className="mb-6" style={{ color: 'var(--color-text-muted)' }}>
               {selectedTagFilter
                 ? 'Aucun profil favori ne correspond à ce filtre.'
                 : 'Commencez à ajouter des profils à vos favoris pour les retrouver facilement ici.'}
@@ -321,13 +323,13 @@ export default function Favorites() {
                 Voir tous les favoris
               </Button>
             ) : (
-              <Button onClick={() => navigate('/browse')}>Explorer les profils</Button>
+              <Button onClick={() => navigate('/browse')} style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>Explorer les profils</Button>
             )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProfiles.map((profile) => (
-              <Card key={profile.user_id} className="overflow-hidden relative">
+              <Card key={profile.user_id} className="overflow-hidden relative" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
                 {selectionMode && (
                   <div className="absolute top-2 left-2 z-10">
                     <Checkbox
@@ -355,7 +357,7 @@ export default function Favorites() {
                   />
                 </div>
 
-                <div className="p-4 border-t space-y-3">
+                <div className="p-4 space-y-3" style={{ borderTop: '1px solid var(--color-border-default)' }}>
                   <FavoriteTagSelector profileId={profile.user_id} />
 
                   {!selectionMode && (

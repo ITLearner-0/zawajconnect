@@ -23,12 +23,12 @@ const AdminModeration: React.FC = () => {
 
   return (
     <AdminRoute>
-      <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-semibold mb-6">Admin Moderation Dashboard</h1>
+      <div className="container mx-auto py-10" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <h1 className="text-3xl font-semibold mb-6" style={{ color: 'var(--color-text-primary)' }}>Admin Moderation Dashboard</h1>
 
         <SetupButton show={showSetupButton} onSetupComplete={handleSetupComplete} />
 
-        {error && <div className="text-red-500 mb-4">Error: {error}</div>}
+        {error && <div className="mb-4" style={{ color: 'var(--color-danger)' }}>Error: {error}</div>}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
@@ -54,9 +54,9 @@ const AdminModeration: React.FC = () => {
 
           <TabsContent value="emergency">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-4">Emergency Protocols</h2>
-                <p className="text-muted-foreground mb-4">
+              <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
+                <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Emergency Protocols</h2>
+                <p className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
                   This center manages emergency reports from users. High priority incidents are
                   highlighted for immediate attention.
                 </p>
@@ -69,35 +69,35 @@ const AdminModeration: React.FC = () => {
                 />
               </Card>
 
-              <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-4">Recent Escalations</h2>
+              <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
+                <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Recent Escalations</h2>
                 <div className="space-y-4">
                   {/* This would typically come from the database */}
-                  <div className="border rounded-lg p-4">
+                  <div className="rounded-lg p-4" style={{ border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)' }}>
                     <div className="flex justify-between">
-                      <h3 className="font-medium">Immediate Threat Report</h3>
-                      <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                      <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Immediate Threat Report</h3>
+                      <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)' }}>
                         High
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">Reported 23 minutes ago</p>
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>Reported 23 minutes ago</p>
                     <div className="flex justify-end mt-3">
-                      <button className="text-sm text-blue-600 hover:underline">
+                      <button className="text-sm hover:underline" style={{ color: 'var(--color-accent)' }}>
                         View Details
                       </button>
                     </div>
                   </div>
 
-                  <div className="border rounded-lg p-4">
+                  <div className="rounded-lg p-4" style={{ border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)' }}>
                     <div className="flex justify-between">
-                      <h3 className="font-medium">Harassment Report</h3>
-                      <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">
+                      <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Harassment Report</h3>
+                      <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}>
                         Medium
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">Reported 2 hours ago</p>
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>Reported 2 hours ago</p>
                     <div className="flex justify-end mt-3">
-                      <button className="text-sm text-blue-600 hover:underline">
+                      <button className="text-sm hover:underline" style={{ color: 'var(--color-accent)' }}>
                         View Details
                       </button>
                     </div>

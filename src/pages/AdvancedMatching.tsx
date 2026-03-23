@@ -49,15 +49,15 @@ const AdvancedMatching = () => {
   return (
     <div className="space-y-8">
       {/* Page Header */}
-      <div className="bg-card rounded-lg border p-6">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Matching Avancé</h1>
-        <p className="text-muted-foreground">
+      <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Matching Avancé</h1>
+        <p style={{ color: 'var(--color-text-secondary)' }}>
           Trouvez des profils compatibles grâce à notre système de matching intelligent
         </p>
       </div>
 
       {/* Main Navigation */}
-      <div className="bg-card rounded-lg border p-6">
+      <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <Tabs
           value={mainTab}
           onValueChange={(val) => {
@@ -89,17 +89,19 @@ const AdvancedMatching = () => {
 
           {/* Sub Navigation */}
           <div>
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">Options</h3>
+            <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Options</h3>
             <div className="flex items-center gap-2 flex-wrap">
               {subTabs[mainTab as keyof typeof subTabs].map((tab) => (
                 <button
                   key={tab.value}
                   onClick={() => setSubTab(tab.value)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border ${
-                    subTab === tab.value
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-background border-border hover:bg-muted'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium"
+                  style={{
+                    borderRadius: 'var(--radius-md)',
+                    border: subTab === tab.value ? '1px solid var(--color-primary)' : '1px solid var(--color-border-default)',
+                    backgroundColor: subTab === tab.value ? 'var(--color-primary)' : 'var(--color-bg-card)',
+                    color: subTab === tab.value ? '#fff' : 'var(--color-text-primary)',
+                  }}
                 >
                   <tab.icon className="h-4 w-4" />
                   {tab.label}

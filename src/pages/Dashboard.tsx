@@ -272,14 +272,27 @@ const Dashboard = () => {
     return null;
   }
 
+  const firstName = profile?.full_name?.split(' ')[0] || '';
+
   return (
-    <div className="space-y-6 p-4 max-w-full overflow-x-hidden w-full">
-      {/* Header Section */}
-      <div className="border rounded p-4">
+    <div
+      className="space-y-6 p-5 max-w-full overflow-x-hidden w-full"
+      style={{ background: 'var(--color-bg-page)' }}
+    >
+      {/* Header Section — Emerald greeting */}
+      <div
+        className="rounded-2xl p-5"
+        style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+      >
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-1">Tableau de Bord</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1
+              className="text-[22px] font-arabic font-bold mb-1"
+              style={{ color: 'var(--color-primary)' }}
+            >
+              Assalamu Alaykum{firstName ? `, ${firstName}` : ''}
+            </h1>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
               Vue d'ensemble de votre profil et activité
             </p>
           </div>
@@ -298,91 +311,115 @@ const Dashboard = () => {
       <CompatibilityPrompt />
 
       {/* Statistics Section */}
-      <div className="border rounded p-4 max-w-full overflow-x-hidden w-full">
-        <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Statistiques</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 w-full">
-          <div className="p-3 border rounded">
-            <div className="flex items-center gap-2 mb-2">
-              <User className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Profil</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {profile?.bio ? 'Complet' : 'À compléter'}
-            </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
+        <div
+          className="p-4 rounded-2xl"
+          style={{ background: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)' }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <User className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Profil</span>
           </div>
+          <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
+            {profile?.bio ? '100%' : '40%'}
+          </p>
+          <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+            {profile?.bio ? 'Complet' : 'À compléter'}
+          </p>
+        </div>
 
-          <div className="p-3 border rounded">
-            <div className="flex items-center gap-2 mb-2">
-              <Heart className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Préférences</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {islamicPrefs?.sect ? 'Configurées' : 'À configurer'}
-            </p>
+        <div
+          className="p-4 rounded-2xl"
+          style={{ background: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)' }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Heart className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Préférences</span>
           </div>
+          <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
+            {islamicPrefs?.sect ? '✓' : '—'}
+          </p>
+          <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+            {islamicPrefs?.sect ? 'Configurées' : 'À configurer'}
+          </p>
+        </div>
 
-          <div
-            className="p-3 border rounded cursor-pointer"
-            onClick={() => navigate('/advanced-matching')}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <Brain className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Matching IA</span>
-            </div>
-            <p className="text-xs text-muted-foreground">Système avancé</p>
+        <div
+          className="p-4 rounded-2xl cursor-pointer"
+          style={{ background: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)' }}
+          onClick={() => navigate('/advanced-matching')}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Brain className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Matching IA</span>
           </div>
+          <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>IA</p>
+          <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Système avancé</p>
+        </div>
 
-          <div className="p-3 border rounded">
-            <CompatibilityCard compact />
-          </div>
+        <div
+          className="p-4 rounded-2xl"
+          style={{ background: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)' }}
+        >
+          <CompatibilityCard compact />
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="border rounded p-4 max-w-full overflow-x-hidden w-full">
-        <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Actions rapides</h2>
+      <div
+        className="rounded-2xl p-5 max-w-full overflow-x-hidden w-full"
+        style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+      >
+        <h2 className="text-lg font-semibold mb-4 pb-2" style={{ color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-subtle)' }}>
+          Actions rapides
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
-          <Button
-            variant="outline"
-            className="justify-start py-3"
+          <button
+            className="flex items-center gap-3 p-3 rounded-xl text-left transition-colors"
+            style={{ background: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }}
             onClick={() => navigate('/advanced-matching')}
           >
-            <Brain className="h-4 w-4 mr-2" />
-            <div className="text-left">
-              <div className="text-sm font-medium">Matching Avancé</div>
-              <div className="text-xs text-muted-foreground">Analyse IA de compatibilité</div>
+            <Brain className="h-5 w-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+            <div>
+              <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Matching Avancé</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Analyse IA de compatibilité</div>
             </div>
-          </Button>
+          </button>
 
-          <Button
-            variant="outline"
-            className="justify-start py-3"
+          <button
+            className="flex items-center gap-3 p-3 rounded-xl text-left transition-colors"
+            style={{ background: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }}
             onClick={() => navigate('/browse')}
           >
-            <Target className="h-4 w-4 mr-2" />
-            <div className="text-left">
-              <div className="text-sm font-medium">Découvrir</div>
-              <div className="text-xs text-muted-foreground">Parcourir les profils</div>
+            <Target className="h-5 w-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+            <div>
+              <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Découvrir</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Parcourir les profils</div>
             </div>
-          </Button>
+          </button>
 
-          <Button
-            variant="outline"
-            className="justify-start py-3"
+          <button
+            className="flex items-center gap-3 p-3 rounded-xl text-left transition-colors"
+            style={{ background: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }}
             onClick={() => navigate('/compatibility-insights')}
           >
-            <Sparkles className="h-4 w-4 mr-2" />
-            <div className="text-left">
-              <div className="text-sm font-medium">Mes Insights</div>
-              <div className="text-xs text-muted-foreground">Analyses personnalisées</div>
+            <Sparkles className="h-5 w-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+            <div>
+              <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Mes Insights</div>
+              <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Analyses personnalisées</div>
             </div>
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Profile Management Section */}
-      <div className="border rounded p-4 max-w-full overflow-x-hidden w-full">
-        <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Gestion du Profil</h2>
+      <div
+        className="rounded-2xl p-5 max-w-full overflow-x-hidden w-full"
+        style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+      >
+        <h2 className="text-lg font-semibold mb-4 pb-2" style={{ color: 'var(--color-text-primary)', borderBottom: '1px solid var(--color-border-subtle)' }}>
+          Gestion du Profil
+        </h2>
 
         <div className="space-y-6">
           {/* Main Content */}
@@ -399,7 +436,7 @@ const Dashboard = () => {
               </ResponsiveTabsList>
 
               <TabsContent value="profile" className="space-y-4">
-                <div className="border rounded p-4">
+                <div className="rounded-xl p-4" style={{ border: '1px solid var(--color-border-default)' }}>
                   <h3 className="text-base font-semibold mb-4 pb-2 border-b flex items-center gap-2">
                     <User className="h-4 w-4" />
                     Informations Personnelles
@@ -579,7 +616,7 @@ const Dashboard = () => {
               </TabsContent>
 
               <TabsContent value="islamic" className="space-y-4">
-                <div className="border rounded p-4">
+                <div className="rounded-xl p-4" style={{ border: '1px solid var(--color-border-default)' }}>
                   <h3 className="text-base font-semibold mb-4 pb-2 border-b flex items-center gap-2">
                     <Heart className="h-4 w-4" />
                     Préférences Islamiques
@@ -689,7 +726,7 @@ const Dashboard = () => {
               </TabsContent>
 
               <TabsContent value="privacy" className="space-y-4">
-                <div className="border rounded p-4">
+                <div className="rounded-xl p-4" style={{ border: '1px solid var(--color-border-default)' }}>
                   <h3 className="text-base font-semibold mb-4 pb-2 border-b flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Paramètres de confidentialité

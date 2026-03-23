@@ -75,31 +75,31 @@ const MahrCalculator = () => {
   const totalMahr = (parseInt(mahr.immediateAmount) || 0) + (parseInt(mahr.deferredAmount) || 0);
 
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl">
+    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 text-white mb-2">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-2" style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>
           <Scale className="h-8 w-8" />
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
           Mahr & Contrat de Mariage
         </h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">
+        <p className="max-w-xl mx-auto" style={{ color: 'var(--color-text-muted)' }}>
           Calculez le mahr, personnalisez votre contrat de mariage (nikah) et générez un document complet.
         </p>
       </div>
 
       {/* Islamic Reminder */}
-      <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50">
+      <Card style={{ backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning-border)', borderRadius: 'var(--radius-lg)' }}>
         <CardContent className="pt-6">
           <div className="flex gap-3">
-            <BookOpen className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <BookOpen className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-warning)' }} />
             <div>
-              <p className="text-sm text-amber-800 italic">
+              <p className="text-sm italic" style={{ color: 'var(--color-text-primary)' }}>
                 « Le meilleur mariage est celui qui est le plus facile (en termes de mahr). »
               </p>
-              <p className="text-xs text-amber-600 mt-1">— Hadith rapporté par Ahmad</p>
-              <p className="text-xs text-amber-600 mt-1">
+              <p className="text-xs mt-1" style={{ color: 'var(--color-warning)' }}>— Hadith rapporté par Ahmad</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--color-warning)' }}>
                 Le mahr est un droit de l'épouse. Il peut être de l'argent, des biens, ou même l'enseignement du Coran.
               </p>
             </div>
@@ -116,10 +116,10 @@ const MahrCalculator = () => {
 
         {/* Calculator Tab */}
         <TabsContent value="calculator" className="space-y-4">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-amber-500" />
+                <Calculator className="h-5 w-5" style={{ color: 'var(--color-warning)' }} />
                 Calculer le Mahr
               </CardTitle>
             </CardHeader>
@@ -174,7 +174,7 @@ const MahrCalculator = () => {
                         onChange={(e) => setMahr({ ...mahr, deferredAmount: e.target.value })}
                         placeholder="Montant"
                       />
-                      <span className="flex items-center text-sm text-muted-foreground">{mahr.currency}</span>
+                      <span className="flex items-center text-sm" style={{ color: 'var(--color-text-muted)' }}>{mahr.currency}</span>
                     </div>
                   </div>
                 )}
@@ -191,25 +191,25 @@ const MahrCalculator = () => {
               </div>
 
               {/* Summary */}
-              <Card className="border-amber-200 bg-amber-50">
+              <Card style={{ backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning-border)', borderRadius: 'var(--radius-md)' }}>
                 <CardContent className="pt-4 pb-4">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Mahr total</p>
-                    <p className="text-3xl font-bold text-amber-700">
+                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Mahr total</p>
+                    <p className="text-3xl font-bold" style={{ color: 'var(--color-warning)' }}>
                       {totalMahr.toLocaleString()} {mahr.currency === 'EUR' ? '€' : mahr.currency}
                     </p>
                     {mahr.type === 'both' && (
                       <div className="flex gap-4 justify-center mt-2">
-                        <span className="text-sm text-emerald-600">
+                        <span className="text-sm" style={{ color: 'var(--color-success)' }}>
                           Avancé: {parseInt(mahr.immediateAmount || '0').toLocaleString()} €
                         </span>
-                        <span className="text-sm text-blue-600">
+                        <span className="text-sm" style={{ color: 'var(--color-accent)' }}>
                           Différé: {parseInt(mahr.deferredAmount || '0').toLocaleString()} €
                         </span>
                       </div>
                     )}
                     {mahr.inKind && (
-                      <p className="text-sm text-amber-600 mt-1">+ {mahr.inKind}</p>
+                      <p className="text-sm mt-1" style={{ color: 'var(--color-warning)' }}>+ {mahr.inKind}</p>
                     )}
                   </div>
                 </CardContent>
@@ -220,15 +220,15 @@ const MahrCalculator = () => {
 
         {/* Contract Tab */}
         <TabsContent value="contract" className="space-y-4">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="h-5 w-5 text-amber-500" />
+                <FileText className="h-5 w-5" style={{ color: 'var(--color-warning)' }} />
                 Clauses du contrat
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 Sélectionnez les clauses à inclure dans votre contrat de mariage. Toutes sont conformes au droit islamique.
               </p>
               {['rights', 'conditions', 'financial'].map((cat) => (
@@ -239,19 +239,27 @@ const MahrCalculator = () => {
                   {clauses.filter((c) => c.category === cat).map((clause) => (
                     <div
                       key={clause.id}
-                      className={`flex items-start gap-3 p-3 rounded-lg mb-2 cursor-pointer transition-all ${
-                        clause.selected ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50 border border-transparent'
-                      }`}
+                      className="flex items-start gap-3 p-3 mb-2 cursor-pointer transition-all"
+                      style={
+                        clause.selected
+                          ? { backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning-border)', borderRadius: 'var(--radius-md)' }
+                          : { backgroundColor: 'var(--color-bg-subtle)', border: '1px solid transparent', borderRadius: 'var(--radius-md)' }
+                      }
                       onClick={() => toggleClause(clause.id)}
                     >
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        clause.selected ? 'bg-amber-500 border-amber-500' : 'border-gray-300'
-                      }`}>
+                      <div
+                        className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={
+                          clause.selected
+                            ? { backgroundColor: 'var(--color-warning)', border: '2px solid var(--color-warning)' }
+                            : { border: '2px solid var(--color-border-strong)' }
+                        }
+                      >
                         {clause.selected && <CheckCircle2 className="h-3 w-3 text-white" />}
                       </div>
                       <div>
                         <p className="font-medium text-sm">{clause.label}</p>
-                        <p className="text-xs text-muted-foreground">{clause.description}</p>
+                        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{clause.description}</p>
                       </div>
                     </div>
                   ))}
@@ -261,7 +269,7 @@ const MahrCalculator = () => {
           </Card>
 
           {/* Witnesses */}
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
               <CardTitle className="text-lg">Témoins et officiant</CardTitle>
             </CardHeader>
@@ -309,10 +317,10 @@ const MahrCalculator = () => {
 
           {/* Generate */}
           <div className="flex gap-3">
-            <Button className="flex-1 bg-amber-600 hover:bg-amber-700">
+            <Button className="flex-1" style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>
               <Download className="h-4 w-4 mr-2" /> Télécharger le contrat (PDF)
             </Button>
-            <Button variant="outline" className="border-amber-300 text-amber-600">
+            <Button variant="outline" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-primary)' }}>
               <Printer className="h-4 w-4 mr-2" /> Imprimer
             </Button>
           </div>
@@ -320,33 +328,33 @@ const MahrCalculator = () => {
 
         {/* Reference Tab */}
         <TabsContent value="reference" className="space-y-4">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Gift className="h-5 w-5 text-amber-500" />
+                <Gift className="h-5 w-5" style={{ color: 'var(--color-warning)' }} />
                 Références du Mahr par région
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {mahrExamples.map((ex) => (
-                  <div key={ex.region} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                  <div key={ex.region} className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-md)' }}>
                     <div>
                       <p className="font-medium text-sm">{ex.region}</p>
-                      <p className="text-xs text-muted-foreground">{ex.note}</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{ex.note}</p>
                     </div>
                     <Badge variant="outline" className="font-medium">{ex.range}</Badge>
                   </div>
                 ))}
               </div>
 
-              <Card className="mt-4 border-emerald-200 bg-emerald-50">
+              <Card className="mt-4" style={{ backgroundColor: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)', borderRadius: 'var(--radius-lg)' }}>
                 <CardContent className="pt-4 pb-4">
                   <div className="flex gap-2">
-                    <Info className="h-5 w-5 text-emerald-600 flex-shrink-0" />
+                    <Info className="h-5 w-5 flex-shrink-0" style={{ color: 'var(--color-success)' }} />
                     <div>
-                      <p className="text-sm font-medium text-emerald-800">Le mahr de Fatima رضي الله عنها</p>
-                      <p className="text-xs text-emerald-700 mt-1">
+                      <p className="text-sm font-medium" style={{ color: 'var(--color-success)' }}>Le mahr de Fatima رضي الله عنها</p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                         Le mahr de Fatima, fille du Prophète ﷺ, était une cotte de mailles (armure) de Ali رضي الله عنه.
                         Cela montre que le mahr peut être modeste et de toute nature.
                       </p>

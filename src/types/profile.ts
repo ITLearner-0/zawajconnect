@@ -40,58 +40,38 @@ export interface ProfileFormData {
   preferredLanguages?: string[];
 }
 
-// Database profile interface — mirrors the `profiles` table.
-// The table has a single `full_name` column (no first_name / last_name).
+// Database profile interface — mirrors the actual `profiles` table columns.
 export interface DatabaseProfile {
   id: string;
-  user_id?: string;
-  full_name: string;
-  gender: string;
-  birth_date?: string;
-  age?: number;
-  location?: string;
-  education_level?: string;
-  occupation?: string;
-  religious_practice_level?: string;
-  madhab?: string;
-  prayer_frequency?: string;
-  bio?: string;
-  about_me?: string;
-  looking_for?: string;
-  wali_name?: string;
-  wali_relationship?: string;
-  wali_contact?: string;
-  profile_picture?: string;
-  avatar_url?: string;
-  gallery?: string[];
+  user_id: string;
+  full_name: string | null;
+  gender: string | null;
+  age: number | null;
+  location?: string | null;
+  education?: string | null;
+  profession?: string | null;
+  bio?: string | null;
+  looking_for?: string | null;
+  avatar_url?: string | null;
   interests?: string[];
-  polygamy_stance?: string;
-  languages?: string[];
-  marital_status?: string;
-  has_children?: boolean;
-  nationality?: string;
-  mother_tongue?: string;
-  religious_level?: string;
-  niyyah_stated_at?: string;
-  spoken_languages?: string[];
-  preferred_languages?: string[];
-  email_verified: boolean;
-  phone_verified: boolean;
-  id_verified: boolean;
-  wali_verified: boolean;
-  privacy_settings?: PrivacySettings;
-  is_visible: boolean;
-  is_verified: boolean;
+  marital_status?: string | null;
+  has_children?: boolean | null;
+  nationality?: string | null;
+  mother_tongue?: string | null;
+  religious_level?: string | null;
+  niyyah_stated_at?: string | null;
+  onboarding_completed?: boolean | null;
+  phone?: string | null;
+  privacy_settings?: PrivacySettings | null;
+  is_visible?: boolean | null;
+  is_wali?: boolean | null;
   blocked_users?: string[];
-  content_flags?: any[];
-  moderation_status?: string;
-  last_moderation_date?: string;
-  photo_blur_settings?: {
-    blur_profile_picture: boolean;
-    blur_gallery_photos: boolean;
-    blur_until_approved: boolean;
-    blur_for_non_matches: boolean;
-  };
+  supervised_by_wali_id?: string | null;
+  wali_approval_required?: boolean | null;
+  wali_registration_id?: string | null;
+  wali_supervision_level?: string | null;
+  terms_accepted_at?: string | null;
+  terms_version?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -123,9 +103,8 @@ export interface Conversation {
   retention_policy?: RetentionPolicy;
   last_message?: Message;
   profile?: {
-    first_name: string;
-    last_name: string;
-    profile_picture?: string;
+    full_name: string | null;
+    avatar_url?: string | null;
   };
 }
 

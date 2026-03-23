@@ -224,17 +224,17 @@ const NikahAdvisor = () => {
   };
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-3xl">
+    <div className="container mx-auto py-6 px-4 max-w-3xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="flex flex-col h-[calc(100vh-120px)]">
         {/* Header */}
         <div className="flex items-center justify-between pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>
               <Moon className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">Assistant Nikah</h1>
-              <p className="text-xs text-muted-foreground">Conseiller matrimonial islamique</p>
+              <h1 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Assistant Nikah</h1>
+              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Conseiller matrimonial islamique</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -259,7 +259,7 @@ const NikahAdvisor = () => {
                   <span className="flex items-center gap-2">
                     <span>{opt.icon}</span>
                     <span>{opt.label}</span>
-                    <span className="text-xs text-muted-foreground ml-1">— {opt.description}</span>
+                    <span className="text-xs ml-1" style={{ color: 'var(--color-text-muted)' }}>— {opt.description}</span>
                   </span>
                 </SelectItem>
               ))}
@@ -269,19 +269,22 @@ const NikahAdvisor = () => {
 
         {/* History Panel */}
         {showHistory && sessions.length > 0 && (
-          <Card className="mb-3 max-h-48 overflow-y-auto">
+          <Card className="mb-3 max-h-48 overflow-y-auto" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardContent className="pt-4 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">Conversations précédentes</p>
+              <p className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>Conversations précédentes</p>
               {sessions.slice(0, 10).map((s) => (
                 <div
                   key={s.session_id}
-                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center gap-2 p-2 rounded-lg cursor-pointer"
+                  style={{ borderRadius: 'var(--radius-md)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                   onClick={() => loadSession(s.session_id)}
                 >
-                  <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                  <MessageCircle className="h-3.5 w-3.5" style={{ color: 'var(--color-text-muted)' }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm truncate">{s.first_message}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                       {new Date(s.created_at).toLocaleDateString('fr-FR')}
                     </p>
                   </div>
@@ -298,20 +301,23 @@ const NikahAdvisor = () => {
         <div className="flex-1 overflow-y-auto space-y-4 pb-4">
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] rounded-2xl p-4 ${
-                message.role === 'user'
-                  ? 'bg-emerald-600 text-white rounded-br-md'
-                  : 'bg-gray-50 border rounded-bl-md'
-              }`}>
+              <div
+                className={`max-w-[85%] rounded-2xl p-4 ${
+                  message.role === 'user' ? 'rounded-br-md' : 'rounded-bl-md'
+                }`}
+                style={
+                  message.role === 'user'
+                    ? { backgroundColor: 'var(--color-primary)', color: '#fff' }
+                    : { backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }
+                }
+              >
                 {message.role === 'assistant' && (
                   <div className="flex items-center gap-2 mb-2">
-                    <Moon className="h-4 w-4 text-emerald-600" />
-                    <span className="text-xs font-medium text-emerald-600">Assistant Nikah</span>
+                    <Moon className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+                    <span className="text-xs font-medium" style={{ color: 'var(--color-primary)' }}>Assistant Nikah</span>
                   </div>
                 )}
-                <div className={`text-sm leading-relaxed whitespace-pre-line ${
-                  message.role === 'assistant' ? 'text-gray-700' : ''
-                }`}>
+                <div className={`text-sm leading-relaxed whitespace-pre-line`} style={message.role === 'assistant' ? { color: 'var(--color-text-secondary)' } : {}}>
                   {message.content}
                 </div>
               </div>
@@ -320,13 +326,13 @@ const NikahAdvisor = () => {
 
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-gray-50 border rounded-2xl rounded-bl-md p-4">
+              <div className="rounded-2xl rounded-bl-md p-4" style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }}>
                 <div className="flex items-center gap-2">
-                  <Moon className="h-4 w-4 text-emerald-600" />
+                  <Moon className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-primary-muted)' }} />
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-primary-muted)', animationDelay: '0.1s' }} />
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-primary-muted)', animationDelay: '0.2s' }} />
                   </div>
                 </div>
               </div>
@@ -361,7 +367,7 @@ const NikahAdvisor = () => {
         )}
 
         {/* Input */}
-        <div className="border-t pt-3">
+        <div className="pt-3" style={{ borderTop: '1px solid var(--color-border-default)' }}>
           <div className="flex gap-2">
             <Input
               value={input}
@@ -373,12 +379,12 @@ const NikahAdvisor = () => {
             <Button
               onClick={() => handleSend()}
               disabled={!input.trim() || isTyping}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
             >
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
+          <p className="text-xs mt-2 text-center" style={{ color: 'var(--color-text-muted)' }}>
             Basé sur le Coran, la Sunnah et les avis des savants. Pour des questions spécifiques, consultez un savant qualifié.
           </p>
         </div>

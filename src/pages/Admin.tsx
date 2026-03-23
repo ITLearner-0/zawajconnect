@@ -153,10 +153,10 @@ const Admin = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Vérification des permissions...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+          <p style={{ color: 'var(--color-text-secondary)' }}>Vérification des permissions...</p>
         </div>
       </div>
     );
@@ -164,26 +164,26 @@ const Admin = () => {
 
   if (!isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-full max-w-md">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <Card className="w-full max-w-md" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
-              <Shield className="h-6 w-6 text-destructive" />
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-danger-bg)' }}>
+              <Shield className="h-6 w-6" style={{ color: 'var(--color-danger)' }} />
             </div>
-            <CardTitle className="text-destructive">Accès Administrateur Requis</CardTitle>
-            <CardDescription>
+            <CardTitle style={{ color: 'var(--color-danger)' }}>Accès Administrateur Requis</CardTitle>
+            <CardDescription style={{ color: 'var(--color-text-muted)' }}>
               Vous devez être administrateur pour accéder à cette section.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
               <p>
                 Si vous êtes le propriétaire de cette application, vous pouvez vous accorder les
                 privilèges Super Admin.
               </p>
             </div>
             <div className="flex flex-col gap-2">
-              <Button onClick={grantSuperAdminAccess} className="w-full" variant="default">
+              <Button onClick={grantSuperAdminAccess} className="w-full" style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>
                 <Crown className="h-4 w-4 mr-2" />
                 Devenir Super Admin
               </Button>
@@ -191,6 +191,7 @@ const Admin = () => {
                 onClick={() => navigate('/profile')}
                 variant="outline"
                 className="w-full"
+                style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}
               >
                 Retour au tableau de bord
               </Button>
@@ -202,15 +203,15 @@ const Admin = () => {
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto py-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="mb-6">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald to-gold flex items-center justify-center">
-            <Crown className="h-5 w-5 text-white" />
+          <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
+            <Crown className="h-5 w-5" style={{ color: '#fff' }} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Administration</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Administration</h1>
+            <p style={{ color: 'var(--color-text-muted)' }}>
               Rôle: <span className="font-medium capitalize">{userRole?.replace('_', ' ')}</span>
             </p>
           </div>

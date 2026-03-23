@@ -189,17 +189,13 @@ export interface CompatibilityMatch {
   };
   profileData?: {
     id: string;
-    first_name: string;
-    last_name?: string;
+    full_name: string;
     gender: string;
     location?: string;
-    education_level?: string;
-    profile_picture?: string;
+    education?: string;
+    avatar_url?: string;
     age?: number;
-    religious_practice_level?: string;
-    email_verified?: boolean;
-    phone_verified?: boolean;
-    id_verified?: boolean;
+    religious_level?: string;
   };
 }
 

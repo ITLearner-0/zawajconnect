@@ -1,3 +1,4 @@
+import './styles/design-system.css';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './i18n'; // Initialize i18next BEFORE App to ensure it's ready

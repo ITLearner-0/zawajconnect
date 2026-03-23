@@ -41,7 +41,7 @@ export function useEnhancedCompatibilityMatches() {
           return {
             userId: otherResult.user_id,
             fullName: profileData
-              ? `${profileData.first_name} ${profileData.last_name || ''}`.trim()
+              ? (profileData.full_name || 'Utilisateur')
               : 'Utilisateur',
             score: scoreResult.score,
             compatibilityScore: scoreResult.score,

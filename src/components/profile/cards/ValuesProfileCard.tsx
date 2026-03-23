@@ -1,6 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Sparkles } from 'lucide-react';
+import { ZBadge } from '@/components/ui/ZBadge';
 
 interface ValueDimension {
   label: string;
@@ -21,13 +20,6 @@ const DEFAULT_DIMENSIONS: ValueDimension[] = [
   { label: 'Vision financière', score: 0 },
 ];
 
-const getBarColor = (score: number): string => {
-  if (score >= 80) return 'bg-green-500';
-  if (score >= 60) return 'bg-green-400';
-  if (score >= 40) return 'bg-amber-400';
-  return 'bg-gray-400';
-};
-
 const ValuesProfileCard = ({
   dimensions = DEFAULT_DIMENSIONS,
   totalResponses = 0,
@@ -35,48 +27,61 @@ const ValuesProfileCard = ({
   const hasData = totalResponses > 0;
 
   return (
-    <Card className="dark:bg-gray-900 dark:border-gray-800">
-      <CardHeader className="pb-3">
+    <div
+      className="rounded-2xl"
+      style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+    >
+      <div className="p-4 pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <Sparkles className="h-4 w-4" />
+          <h3
+            className="text-base font-semibold flex items-center gap-2"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            <Sparkles className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
             Profil de valeurs
-          </CardTitle>
+          </h3>
           {hasData && (
-            <Badge variant="secondary" className="text-xs">
+            <ZBadge variant="muted">
               Basé sur {totalResponses} réponses
-            </Badge>
+            </ZBadge>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div className="px-4 pb-4">
         {hasData ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
             {dimensions.map((dim) => (
               <div key={dim.label} className="space-y-1">
-                <p className="text-xs text-muted-foreground">{dim.label}</p>
-                <div className="h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{dim.label}</p>
+                <div
+                  className="rounded-full overflow-hidden"
+                  style={{ height: 8, borderRadius: 4, background: 'var(--color-border-subtle)' }}
+                >
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${getBarColor(dim.score)}`}
-                    style={{ width: `${dim.score}%` }}
+                    className="h-full transition-all duration-500"
+                    style={{
+                      width: `${dim.score}%`,
+                      borderRadius: 4,
+                      background: dim.score >= 60 ? 'var(--color-primary)' : dim.score >= 40 ? 'var(--color-warning)' : 'var(--color-text-disabled)',
+                    }}
                   />
                 </div>
-                <p className="text-xs font-medium">{dim.score}%</p>
+                <p className="text-xs font-medium" style={{ color: 'var(--color-text-primary)' }}>{dim.score}%</p>
               </div>
             ))}
           </div>
         ) : (
           <div className="text-center py-4 space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
               Répondez aux questions quotidiennes pour construire votre profil de valeurs
             </p>
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-xs italic" style={{ color: 'var(--color-text-hint)' }}>
               Disponible prochainement
             </p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

@@ -72,28 +72,28 @@ const SmartTiming = () => {
   const [quietHours, setQuietHours] = useState(true);
   const [weeklyReport, setWeeklyReport] = useState(true);
 
-  const getHeatColor = (value: number) => {
-    if (value >= 5) return 'bg-emerald-500';
-    if (value >= 4) return 'bg-emerald-400';
-    if (value >= 3) return 'bg-emerald-300';
-    if (value >= 2) return 'bg-emerald-200';
-    if (value >= 1) return 'bg-emerald-100';
-    return 'bg-gray-100';
+  const getHeatStyle = (value: number): React.CSSProperties => {
+    if (value >= 5) return { backgroundColor: 'var(--color-primary)' };
+    if (value >= 4) return { backgroundColor: 'var(--color-primary)', opacity: 0.8 };
+    if (value >= 3) return { backgroundColor: 'var(--color-primary-muted)' };
+    if (value >= 2) return { backgroundColor: 'var(--color-primary-light)' };
+    if (value >= 1) return { backgroundColor: 'var(--color-bg-subtle)' };
+    return { backgroundColor: 'var(--color-bg-hover)' };
   };
 
   const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl">
+    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-white mb-2">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full text-white mb-2" style={{ backgroundColor: 'var(--color-accent)' }}>
           <Zap className="h-8 w-8" />
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
           Smart Timing & Engagement
         </h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">
+        <p className="max-w-xl mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
           Optimisez vos échanges avec des insights intelligents sur le meilleur moment pour communiquer.
         </p>
       </div>
@@ -102,31 +102,31 @@ const SmartTiming = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <Clock className="h-6 w-6 text-cyan-500 mx-auto mb-1" />
+            <Clock className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-accent)' }} />
             <p className="text-lg font-bold">{engagementData.bestTime}</p>
             <p className="text-xs text-muted-foreground">Meilleure heure</p>
           </CardContent>
         </Card>
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <TrendingUp className="h-6 w-6 text-emerald-500 mx-auto mb-1" />
+            <TrendingUp className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-success)' }} />
             <p className="text-lg font-bold">{engagementData.responseRate}%</p>
             <p className="text-xs text-muted-foreground">Taux de réponse</p>
           </CardContent>
         </Card>
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <Flame className="h-6 w-6 text-orange-500 mx-auto mb-1" />
+            <Flame className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-warning)' }} />
             <p className="text-lg font-bold">{engagementData.streak} jours</p>
             <p className="text-xs text-muted-foreground">Série actuelle</p>
           </CardContent>
         </Card>
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <MessageCircle className="h-6 w-6 text-blue-500 mx-auto mb-1" />
+            <MessageCircle className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-accent)' }} />
             <p className="text-lg font-bold flex items-center justify-center gap-1">
               {engagementData.weeklyMessages}
-              <ArrowUp className="h-3 w-3 text-emerald-500" />
+              <ArrowUp className="h-3 w-3" style={{ color: 'var(--color-success)' }} />
             </p>
             <p className="text-xs text-muted-foreground">Messages/semaine</p>
           </CardContent>
@@ -137,7 +137,7 @@ const SmartTiming = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-cyan-500" />
+            <BarChart3 className="h-5 w-5" style={{ color: 'var(--color-accent)' }} />
             Carte d'activité
           </CardTitle>
         </CardHeader>
@@ -158,7 +158,8 @@ const SmartTiming = () => {
                     <td className="text-xs text-muted-foreground pr-3 py-1">{row.hour}</td>
                     {[row.mon, row.tue, row.wed, row.thu, row.fri, row.sat, row.sun].map((val, i) => (
                       <td key={i} className="px-1 py-1">
-                        <div className={`w-full h-8 rounded ${getHeatColor(val)} transition-colors`}
+                        <div className="w-full h-8 rounded transition-colors"
+                          style={getHeatStyle(val)}
                           title={`Activité: ${val}/5`} />
                       </td>
                     ))}
@@ -170,7 +171,7 @@ const SmartTiming = () => {
           <div className="flex items-center gap-2 mt-3 justify-end">
             <span className="text-xs text-muted-foreground">Moins</span>
             {[1, 2, 3, 4, 5].map((v) => (
-              <div key={v} className={`w-4 h-4 rounded ${getHeatColor(v)}`} />
+              <div key={v} className="w-4 h-4 rounded" style={getHeatStyle(v)} />
             ))}
             <span className="text-xs text-muted-foreground">Plus</span>
           </div>
@@ -184,15 +185,15 @@ const SmartTiming = () => {
           {recommendations.map((rec, i) => {
             const Icon = rec.icon;
             return (
-              <Card key={i} className={`hover:shadow-md transition-shadow ${
-                rec.priority === 'high' ? 'border-l-4 border-l-cyan-500' :
-                rec.priority === 'medium' ? 'border-l-4 border-l-blue-400' :
-                'border-l-4 border-l-gray-300'
-              }`}>
+              <Card key={i} className="hover:shadow-md transition-shadow" style={{
+                borderLeft: rec.priority === 'high' ? '4px solid var(--color-primary)' :
+                rec.priority === 'medium' ? '4px solid var(--color-accent)' :
+                '4px solid var(--color-border-default)'
+              }}>
                 <CardContent className="pt-4 pb-4">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-cyan-100">
-                      <Icon className="h-5 w-5 text-cyan-600" />
+                    <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-primary-light)' }}>
+                      <Icon className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
                     </div>
                     <div>
                       <p className="font-medium text-sm">{rec.title}</p>
@@ -210,7 +211,7 @@ const SmartTiming = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <Target className="h-5 w-5 text-purple-500" />
+            <Target className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
             Étapes de la relation
           </CardTitle>
         </CardHeader>
@@ -218,22 +219,23 @@ const SmartTiming = () => {
           <div className="space-y-0">
             {milestones.map((m, i) => (
               <div key={i} className="flex items-center gap-3 py-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  m.reached ? 'bg-emerald-500 text-white' :
-                  m.current ? 'bg-cyan-500 text-white animate-pulse' :
-                  'bg-gray-200 text-gray-400'
-                }`}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{
+                  backgroundColor: m.reached ? 'var(--color-success)' :
+                  m.current ? 'var(--color-accent)' : 'var(--color-bg-subtle)',
+                  color: m.reached || m.current ? '#fff' : 'var(--color-text-muted)',
+                  ...(m.current ? { animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' } : {}),
+                }}>
                   {m.reached ? <CheckCircle2 className="h-4 w-4" /> :
                    m.current ? <Sparkles className="h-4 w-4" /> :
                    <span className="text-xs">{i + 1}</span>}
                 </div>
                 <div className="flex-1">
-                  <p className={`text-sm ${m.reached ? 'text-emerald-700 font-medium' : m.current ? 'font-medium' : 'text-muted-foreground'}`}>
+                  <p className="text-sm" style={{ color: m.reached ? 'var(--color-success)' : m.current ? 'var(--color-text-primary)' : 'var(--color-text-muted)', fontWeight: m.reached || m.current ? 500 : 400 }}>
                     {m.label}
                   </p>
                 </div>
                 {m.current && (
-                  <Badge className="bg-cyan-100 text-cyan-700 text-xs">En cours</Badge>
+                  <Badge className="text-xs" style={{ backgroundColor: 'var(--color-accent-light)', color: 'var(--color-accent)' }}>En cours</Badge>
                 )}
               </div>
             ))}

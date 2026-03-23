@@ -171,7 +171,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background rounded-lg border">
+    <div className="flex flex-col h-full rounded-lg" style={{ backgroundColor: 'var(--color-bg-page)', border: '1px solid var(--color-border-default)' }}>
       {!canCommunicate ? (
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-center max-w-md">
@@ -188,7 +188,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
       ) : (
         <>
           {/* Header */}
-          <div className="flex items-center justify-between border-b p-3 bg-muted/30">
+          <div className="flex items-center justify-between p-3" style={{ backgroundColor: 'var(--color-bg-card)', borderBottom: '1px solid var(--color-border-default)' }}>
             <ChatHeader
               match={match}
               isOnline={isUserOnline(match.other_user.id)}
@@ -214,7 +214,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
 
             <TabsContent
               value="messages"
-              className="flex-1 overflow-y-auto p-4 bg-background mt-0 data-[state=inactive]:hidden"
+              className="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden"
+              style={{ backgroundColor: 'var(--color-bg-page)' }}
             >
               {messages.length === 0 ? (
                 <div className="text-center py-12">
@@ -241,21 +242,22 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
 
             <TabsContent
               value="calls"
-              className="flex-1 overflow-y-auto p-4 bg-background mt-0 data-[state=inactive]:hidden"
+              className="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden"
+              style={{ backgroundColor: 'var(--color-bg-page)' }}
             >
               <CallHistory matchId={matchId} />
             </TabsContent>
           </Tabs>
 
           {/* Islamic Reminder */}
-          <div className="px-4 py-2 bg-muted/50 border-t">
+          <div className="px-4 py-2" style={{ backgroundColor: 'var(--color-bg-card)', borderTop: '1px solid var(--color-border-default)' }}>
             <p className="text-xs text-center text-muted-foreground">
               💝 Rappel : Communiquez avec respect et selon les valeurs islamiques
             </p>
           </div>
 
           {/* Message Input */}
-          <div className="border-t p-3 bg-background">
+          <div className="p-3" style={{ backgroundColor: 'var(--color-bg-card)', borderTop: '1px solid var(--color-border-default)' }}>
             <div className="flex items-center gap-2">
               <Input
                 value={newMessage}
@@ -269,6 +271,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim() || sending || !canCommunicate}
                 size="icon"
+                className="rounded-full"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
               >
                 {sending ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>

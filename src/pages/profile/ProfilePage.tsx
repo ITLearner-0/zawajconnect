@@ -232,11 +232,12 @@ const ProfilePage = () => {
   return (
     <AccessibilityProvider>
       <div
-        className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 py-8"
+        className="min-h-screen py-8"
+        style={{ background: 'var(--color-bg-page)' }}
         role="main"
         aria-labelledby="profile-heading"
       >
-        <div className="container max-w-5xl mx-auto px-4 space-y-4">
+        <div className="container max-w-5xl mx-auto px-5 space-y-4">
           {/* Header — nouveau design sauge */}
           <ProfileHeader
             userEmail={userEmail}
@@ -263,10 +264,10 @@ const ProfilePage = () => {
             </TabsList>
 
             <TabsContent value="profile" className="mt-4">
-              {/* 2-column layout: sidebar (220px) + main content */}
-              <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-3 items-start">
+              {/* 2-column layout: sidebar (200px) + main content */}
+              <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 items-start">
                 {/* COLONNE GAUCHE — sticky */}
-                <div className="flex flex-col gap-3 md:sticky md:top-4">
+                <div className="flex flex-col gap-4 md:sticky md:top-4">
                   <TrustScoreCard
                     verificationStatus={verificationStatus}
                     verificationScore={verificationScore}
@@ -284,7 +285,7 @@ const ProfilePage = () => {
                 </div>
 
                 {/* COLONNE DROITE */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4">
                   <IslamicProfileCard
                     formData={formData}
                     hijabPreference={islamicPrefs.hijabPreference ?? undefined}

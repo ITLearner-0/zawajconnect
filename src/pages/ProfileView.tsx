@@ -294,7 +294,8 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
             action: (
               <button
                 onClick={() => navigate('/onboarding')}
-                className="px-3 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
+                className="px-3 py-2 text-white rounded-md"
+                style={{ backgroundColor: 'var(--color-primary)', borderRadius: 'var(--radius-md)' }}
               >
                 Compléter mon profil
               </button>
@@ -453,7 +454,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <StandardLoadingState message="Chargement du profil..." />
       </div>
     );
@@ -462,7 +463,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   // Error state - No profile found
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50">
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Button
             variant="ghost"
@@ -476,13 +477,14 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg p-12 text-center shadow-lg"
+            className="rounded-lg p-12 text-center shadow-lg"
+            style={{ backgroundColor: 'var(--color-bg-card)', borderRadius: 'var(--radius-lg)' }}
           >
-            <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-              <ArrowLeft className="h-8 w-8 text-gray-400" />
+            <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
+              <ArrowLeft className="h-8 w-8" style={{ color: 'var(--color-text-muted)' }} />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Profil introuvable</h1>
-            <p className="text-gray-600 mb-6">
+            <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Profil introuvable</h1>
+            <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>
               Le profil que vous recherchez n'existe pas ou a été supprimé.
             </p>
             <Button onClick={() => navigate('/discover')}>
@@ -495,7 +497,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto px-4 py-8 max-w-7xl pb-24 lg:pb-8">
         {/* Back Button */}
         <motion.div
@@ -688,20 +690,21 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
             {isOwnProfile && (
               <motion.div variants={staggerItem}>
                 <div
-                  className={`p-6 rounded-lg border-2 ${
-                    completionStats.overall >= 100
-                      ? 'bg-emerald-50 border-emerald-200'
-                      : 'bg-blue-50 border-blue-200'
-                  }`}
+                  className="p-6 rounded-lg border-2"
+                  style={{
+                    backgroundColor: completionStats.overall >= 100 ? 'var(--color-success-bg)' : 'var(--color-info-bg)',
+                    borderColor: completionStats.overall >= 100 ? 'var(--color-success-border)' : 'var(--color-info-border)',
+                    borderRadius: 'var(--radius-lg)',
+                  }}
                 >
                   {completionStats.overall >= 100 ? (
                     <div className="flex items-start gap-3">
-                      <CheckCircle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="h-6 w-6 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
                       <div>
-                        <h3 className="text-lg font-semibold text-emerald-800 mb-1">
+                        <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--color-success)' }}>
                           Félicitations ! Votre profil est complet
                         </h3>
-                        <p className="text-sm text-emerald-700">
+                        <p className="text-sm" style={{ color: 'var(--color-success)' }}>
                           Vous avez rempli toutes les sections de votre profil. Un profil complet
                           augmente considérablement vos chances de trouver des matches compatibles et
                           inspire confiance aux autres utilisateurs.
@@ -710,16 +713,16 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
                     </div>
                   ) : (
                     <div className="flex items-start gap-3">
-                      <TrendingUp className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <TrendingUp className="h-6 w-6 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-info)' }} />
                       <div>
-                        <h3 className="text-lg font-semibold text-blue-800 mb-2">
+                        <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-info)' }}>
                           Conseil pour améliorer votre profil
                         </h3>
-                        <p className="text-sm text-blue-700 mb-3">
+                        <p className="text-sm mb-3" style={{ color: 'var(--color-info)' }}>
                           Un profil complet augmente vos chances de trouver des matches compatibles de
                           300% !
                         </p>
-                        <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                        <ul className="text-sm space-y-1 list-disc list-inside" style={{ color: 'var(--color-info)' }}>
                           {completionStats.basicInfo < 100 && (
                             <li>Complétez vos informations de base ({completionStats.basicInfo}%)</li>
                           )}

@@ -1,5 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Moon } from 'lucide-react';
 import { ProfileFormData } from '@/types/profile';
 
@@ -50,8 +48,10 @@ const getLabel = (category: string, value: string | undefined): string => {
 
 const InfoField = ({ label, value }: { label: string; value: string }) => (
   <div>
-    <p className="text-xs text-muted-foreground">{label}</p>
-    <p className="font-medium text-sm">{value}</p>
+    <p className="text-[10px] uppercase tracking-[0.05em]" style={{ color: 'var(--color-text-muted)' }}>
+      {label}
+    </p>
+    <p className="font-medium text-sm" style={{ color: 'var(--color-text-primary)' }}>{value}</p>
   </div>
 );
 
@@ -59,40 +59,43 @@ const IslamicProfileCard = ({ formData, hijabPreference, beardPreference, lookin
   const resolvedLookingFor = lookingFor || (formData as any)?.lookingFor;
 
   return (
-    <Card className="dark:bg-gray-900 dark:border-gray-800">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <Moon className="h-4 w-4" />
+    <div
+      className="rounded-2xl"
+      style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+    >
+      <div className="p-4 pb-3">
+        <h3
+          className="text-base font-semibold flex items-center gap-2"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          <Moon className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
           Profil islamique
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </h3>
+      </div>
+      <div className="px-4 pb-4 space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <InfoField label="Pratique religieuse" value={getLabel('religiousLevel', formData.religiousLevel)} />
           <InfoField label="Prière quotidienne" value={getLabel('prayerFrequency', formData.prayerFrequency)} />
-          {hijabPreference && (
-            <InfoField label="Port du voile" value={hijabPreference} />
-          )}
-          {beardPreference && (
-            <InfoField label="Barbe" value={beardPreference} />
-          )}
+          {hijabPreference && <InfoField label="Port du voile" value={hijabPreference} />}
+          {beardPreference && <InfoField label="Barbe" value={beardPreference} />}
           <InfoField label="Madhab" value={getLabel('madhab', formData.madhab)} />
           <InfoField label="Langues" value={formData.motherTongue || '—'} />
           <InfoField label="Origine" value={formData.nationality || '—'} />
         </div>
 
-        {/* Ce que je recherche */}
         {resolvedLookingFor && (
           <>
-            <Separator />
+            <hr style={{ borderColor: 'var(--color-border-subtle)' }} />
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Ce que je recherche</p>
-              <p className="text-sm text-foreground">{resolvedLookingFor}</p>
+              <p className="text-[10px] uppercase tracking-[0.05em] mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                Ce que je recherche
+              </p>
+              <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{resolvedLookingFor}</p>
             </div>
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

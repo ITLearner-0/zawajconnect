@@ -62,18 +62,18 @@ const ResetPassword = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center px-4">
-        <Card className="w-full max-w-md border-border/50 shadow-soft bg-card/95 backdrop-blur-sm">
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <Card className="w-full max-w-md" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <div className="h-12 w-12 bg-emerald rounded-full flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-primary-foreground" />
+              <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-success)' }}>
+                <CheckCircle className="h-6 w-6 text-white" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-foreground">
+            <CardTitle className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
               Mot de passe mis à jour !
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardDescription style={{ color: 'var(--color-text-secondary)' }}>
               Votre mot de passe a été modifié avec succès. Vous allez être redirigé vers la page de
               connexion...
             </CardDescription>
@@ -84,30 +84,31 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto px-4 py-8">
         <div className="w-full max-w-md mx-auto">
           <div className="flex items-center gap-2 mb-8 justify-center">
             <Link
               to="/auth"
-              className="flex items-center gap-2 text-emerald hover:text-emerald-dark transition-colors"
+              className="flex items-center gap-2 transition-colors"
+              style={{ color: 'var(--color-primary)' }}
             >
               <ArrowLeft className="h-4 w-4" />
               Retour à la connexion
             </Link>
           </div>
 
-          <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm">
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
-                <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                  <Heart className="h-6 w-6 text-primary-foreground fill-current" />
+                <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
+                  <Heart className="h-6 w-6 text-white fill-current" />
                 </div>
               </div>
-              <CardTitle className="text-2xl font-bold text-foreground">
+              <CardTitle className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
                 Nouveau mot de passe
               </CardTitle>
-              <CardDescription className="text-muted-foreground">
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>
                 Choisissez un nouveau mot de passe pour votre compte
               </CardDescription>
             </CardHeader>
@@ -171,14 +172,15 @@ const ResetPassword = () => {
                 </div>
 
                 {error && (
-                  <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+                  <div className="p-3 text-sm rounded-md" style={{ color: 'var(--color-danger)', backgroundColor: 'var(--color-danger-bg)', border: '1px solid var(--color-danger-border)', borderRadius: 'var(--radius-md)' }}>
                     {error}
                   </div>
                 )}
 
                 <Button
                   type="submit"
-                  className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                  className="w-full"
+                  style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                   disabled={loading}
                 >
                   {loading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}

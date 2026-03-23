@@ -101,7 +101,7 @@ export default function InvitationAuth() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-cream-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center">🕌 Invitation familiale</CardTitle>

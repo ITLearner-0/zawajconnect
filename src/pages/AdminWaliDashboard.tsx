@@ -28,8 +28,8 @@ const AdminWaliDashboard = () => {
 
   if (permissionsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Chargement...</p>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <p style={{ color: 'var(--color-text-secondary)' }}>Chargement...</p>
       </div>
     );
   }
@@ -55,24 +55,24 @@ const AdminWaliDashboard = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-8 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Shield className="w-8 h-8 text-primary" />
+            <Shield className="w-8 h-8" style={{ color: 'var(--color-primary)' }} />
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-3xl font-bold">Dashboard Wali</h1>
+                <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Dashboard Wali</h1>
                 <PermissionBadge role={permissions.role} />
               </div>
-              <p className="text-muted-foreground">
+              <p style={{ color: 'var(--color-text-muted)' }}>
                 Métriques et KPIs en temps réel avec comparaison
               </p>
             </div>
           </div>
           <div className="flex gap-2">
             <PeriodSelector value={period} onChange={setPeriod} />
-            <Button onClick={refetch} disabled={loading} variant="outline">
+            <Button onClick={refetch} disabled={loading} variant="outline" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}>
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Actualiser
             </Button>
@@ -83,10 +83,10 @@ const AdminWaliDashboard = () => {
         <WaliAdminTabs />
       </div>
 
-      <Card>
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <CardHeader>
-          <CardTitle>Vue d'ensemble - {getPeriodLabel()}</CardTitle>
-          <CardDescription>Comparaison avec la période précédente</CardDescription>
+          <CardTitle style={{ color: 'var(--color-text-primary)' }}>Vue d'ensemble - {getPeriodLabel()}</CardTitle>
+          <CardDescription style={{ color: 'var(--color-text-muted)' }}>Comparaison avec la période précédente</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -197,7 +197,7 @@ const AdminWaliDashboard = () => {
               />
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-12" style={{ color: 'var(--color-text-muted)' }}>
               Aucune donnée disponible pour cette période
             </div>
           )}
@@ -206,16 +206,16 @@ const AdminWaliDashboard = () => {
 
       {kpis && (
         <div className="grid gap-4 md:grid-cols-2">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Insights</CardTitle>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Insights</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
-                <TrendingUp className="w-5 h-5 text-green-600 mt-0.5" />
+                <TrendingUp className="w-5 h-5 mt-0.5" style={{ color: 'var(--color-success)' }} />
                 <div>
-                  <p className="font-medium">Performance de Traitement</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Performance de Traitement</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                     {kpis.comparison.processing_time_change < 0
                       ? `Le temps de traitement s'est amélioré de ${Math.abs(kpis.comparison.processing_time_change).toFixed(1)}%`
                       : kpis.comparison.processing_time_change > 0
@@ -226,10 +226,10 @@ const AdminWaliDashboard = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                <CheckCircle className="w-5 h-5 mt-0.5" style={{ color: 'var(--color-accent)' }} />
                 <div>
-                  <p className="font-medium">Taux d'Approbation</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Taux d'Approbation</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                     {kpis.current.approval_rate.toFixed(1)}% des inscriptions sont approuvées
                     {kpis.comparison.approval_rate_change !== 0 &&
                       ` (${kpis.comparison.approval_rate_change > 0 ? '+' : ''}${kpis.comparison.approval_rate_change.toFixed(1)}%)`}
@@ -238,10 +238,10 @@ const AdminWaliDashboard = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 mt-0.5" style={{ color: 'var(--color-warning)' }} />
                 <div>
-                  <p className="font-medium">Alertes de Sécurité</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Alertes de Sécurité</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                     {kpis.current.total_alerts} alertes détectées
                     {kpis.current.critical_alerts > 0 &&
                       ` dont ${kpis.current.critical_alerts} critiques`}
@@ -251,52 +251,52 @@ const AdminWaliDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Comparaison de Période</CardTitle>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Comparaison de Période</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Période actuelle</span>
-                  <span className="text-sm text-muted-foreground">{getPeriodLabel()}</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Période actuelle</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{getPeriodLabel()}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Inscriptions</span>
                   <span className="text-sm font-bold">{kpis.current.total_registrations}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Approuvées</span>
-                  <span className="text-sm font-bold text-green-600">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Approuvées</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-success)' }}>
                     {kpis.current.approved_count}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Rejetées</span>
-                  <span className="text-sm font-bold text-red-600">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Rejetées</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-danger)' }}>
                     {kpis.current.rejected_count}
                   </span>
                 </div>
               </div>
 
-              <div className="border-t pt-4 space-y-2">
+              <div className="pt-4 space-y-2" style={{ borderTop: '1px solid var(--color-border-default)' }}>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Période précédente</span>
-                  <span className="text-sm text-muted-foreground">Comparaison</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Période précédente</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Comparaison</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Inscriptions</span>
                   <span className="text-sm font-bold">{kpis.previous.total_registrations}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Approuvées</span>
-                  <span className="text-sm font-bold text-green-600">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Approuvées</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-success)' }}>
                     {kpis.previous.approved_count}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Rejetées</span>
-                  <span className="text-sm font-bold text-red-600">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Rejetées</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-danger)' }}>
                     {kpis.previous.rejected_count}
                   </span>
                 </div>

@@ -264,10 +264,10 @@ const AdminUserProfile = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Chargement du profil...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+          <p style={{ color: 'var(--color-text-secondary)' }}>Chargement du profil...</p>
         </div>
       </div>
     );
@@ -275,14 +275,14 @@ const AdminUserProfile = () => {
 
   if (!profile) {
     return (
-      <div className="container mx-auto py-8">
-        <Card>
+      <div className="container mx-auto py-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader>
-            <CardTitle>Profil non trouvé</CardTitle>
-            <CardDescription>L'utilisateur demandé n'existe pas</CardDescription>
+            <CardTitle style={{ color: 'var(--color-text-primary)' }}>Profil non trouvé</CardTitle>
+            <CardDescription style={{ color: 'var(--color-text-muted)' }}>L'utilisateur demandé n'existe pas</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate('/admin')}>
+            <Button onClick={() => navigate('/admin')} style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour à l'administration
             </Button>
@@ -293,28 +293,28 @@ const AdminUserProfile = () => {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto py-6 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate('/admin')}>
+        <Button variant="ghost" onClick={() => navigate('/admin')} style={{ color: 'var(--color-text-secondary)' }}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
         </Button>
       </div>
 
       {/* Profile Header */}
-      <Card>
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-6">
             <Avatar className="h-24 w-24">
               <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
-              <AvatarFallback className="text-2xl">
+              <AvatarFallback className="text-2xl" style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
                 {profile.full_name?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 space-y-2">
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold">{profile.full_name}</h1>
+                <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{profile.full_name}</h1>
                 {verification && (
                   <Badge variant={verification.verification_score >= 80 ? 'default' : 'secondary'}>
                     <Shield className="h-3 w-3 mr-1" />
@@ -322,7 +322,7 @@ const AdminUserProfile = () => {
                   </Badge>
                 )}
               </div>
-              <div className="flex flex-wrap gap-4 text-muted-foreground">
+              <div className="flex flex-wrap gap-4" style={{ color: 'var(--color-text-secondary)' }}>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span>{profile.age} ans</span>
@@ -336,7 +336,7 @@ const AdminUserProfile = () => {
                   <span className="capitalize">{profile.gender}</span>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 Inscrit le {new Date(profile.created_at).toLocaleDateString('fr-FR')}
               </p>
             </div>
@@ -346,35 +346,35 @@ const AdminUserProfile = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-emerald" />
+              <Heart className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
               <div>
-                <p className="text-sm text-muted-foreground">Matches Total</p>
-                <p className="text-2xl font-bold">{stats.totalMatches}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Matches Total</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{stats.totalMatches}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-gold" />
+              <MessageCircle className="h-5 w-5" style={{ color: 'var(--color-warning)' }} />
               <div>
-                <p className="text-sm text-muted-foreground">Conversations actives</p>
-                <p className="text-2xl font-bold">{stats.activeConversations}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Conversations actives</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{stats.activeConversations}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-primary" />
+              <MessageCircle className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
               <div>
-                <p className="text-sm text-muted-foreground">Messages envoyés</p>
-                <p className="text-2xl font-bold">{stats.totalMessages}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Messages envoyés</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{stats.totalMessages}</p>
               </div>
             </div>
           </CardContent>
@@ -393,48 +393,48 @@ const AdminUserProfile = () => {
 
         {/* Profile Tab */}
         <TabsContent value="profile">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Informations du profil</CardTitle>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Informations du profil</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <BookOpen className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <BookOpen className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-text-muted)' }} />
                   <div className="flex-1">
-                    <p className="font-medium">Biographie</p>
-                    <p className="text-muted-foreground">{profile.bio || 'Non renseignée'}</p>
+                    <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Biographie</p>
+                    <p style={{ color: 'var(--color-text-secondary)' }}>{profile.bio || 'Non renseignée'}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <GraduationCap className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <GraduationCap className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-text-muted)' }} />
                   <div className="flex-1">
-                    <p className="font-medium">Éducation</p>
-                    <p className="text-muted-foreground">{profile.education || 'Non renseignée'}</p>
+                    <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Éducation</p>
+                    <p style={{ color: 'var(--color-text-secondary)' }}>{profile.education || 'Non renseignée'}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Briefcase className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <Briefcase className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-text-muted)' }} />
                   <div className="flex-1">
-                    <p className="font-medium">Profession</p>
-                    <p className="text-muted-foreground">
+                    <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Profession</p>
+                    <p style={{ color: 'var(--color-text-secondary)' }}>
                       {profile.profession || 'Non renseignée'}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Heart className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <Heart className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-text-muted)' }} />
                   <div className="flex-1">
-                    <p className="font-medium">Centres d'intérêt</p>
+                    <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Centres d'intérêt</p>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {profile.interests?.map((interest, idx) => (
-                        <Badge key={idx} variant="outline">
+                        <Badge key={idx} variant="outline" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}>
                           {interest}
                         </Badge>
-                      )) || <span className="text-muted-foreground">Aucun</span>}
+                      )) || <span style={{ color: 'var(--color-text-muted)' }}>Aucun</span>}
                     </div>
                   </div>
                 </div>
@@ -445,28 +445,28 @@ const AdminUserProfile = () => {
 
         {/* Islamic Preferences Tab */}
         <TabsContent value="islamic">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Préférences Islamiques</CardTitle>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Préférences Islamiques</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {islamicPrefs ? (
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-medium">Fréquence de prière</span>
-                    <span className="text-muted-foreground capitalize">
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Fréquence de prière</span>
+                    <span className="capitalize" style={{ color: 'var(--color-text-secondary)' }}>
                       {islamicPrefs.prayer_frequency}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Lecture du Coran</span>
-                    <span className="text-muted-foreground capitalize">
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Lecture du Coran</span>
+                    <span className="capitalize" style={{ color: 'var(--color-text-secondary)' }}>
                       {islamicPrefs.quran_reading}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Madhab</span>
-                    <span className="text-muted-foreground capitalize">{islamicPrefs.madhab}</span>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Madhab</span>
+                    <span className="capitalize" style={{ color: 'var(--color-text-secondary)' }}>{islamicPrefs.madhab}</span>
                   </div>
                   {islamicPrefs.halal_diet !== undefined && (
                     <div className="flex justify-between">
@@ -478,15 +478,15 @@ const AdminUserProfile = () => {
                   )}
                   {islamicPrefs.hijab_preference && (
                     <div className="flex justify-between">
-                      <span className="font-medium">Préférence Hijab</span>
-                      <span className="text-muted-foreground capitalize">
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Préférence Hijab</span>
+                      <span className="capitalize" style={{ color: 'var(--color-text-secondary)' }}>
                         {islamicPrefs.hijab_preference}
                       </span>
                     </div>
                   )}
                 </div>
               ) : (
-                <p className="text-muted-foreground">Aucune préférence islamique renseignée</p>
+                <p style={{ color: 'var(--color-text-muted)' }}>Aucune préférence islamique renseignée</p>
               )}
             </CardContent>
           </Card>
@@ -494,17 +494,17 @@ const AdminUserProfile = () => {
 
         {/* Matching Preferences Tab */}
         <TabsContent value="matching">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Critères de recherche</CardTitle>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Critères de recherche</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {matchingPrefs ? (
                 <div className="space-y-3">
                   {matchingPrefs.min_age && matchingPrefs.max_age && (
                     <div className="flex justify-between">
-                      <span className="font-medium">Tranche d'âge</span>
-                      <span className="text-muted-foreground">
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Tranche d'âge</span>
+                      <span style={{ color: 'var(--color-text-secondary)' }}>
                         {matchingPrefs.min_age} - {matchingPrefs.max_age} ans
                       </span>
                     </div>
@@ -512,12 +512,12 @@ const AdminUserProfile = () => {
                   {matchingPrefs.preferred_locations &&
                     matchingPrefs.preferred_locations.length > 0 && (
                       <div className="flex items-start gap-3">
-                        <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                        <MapPin className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-text-muted)' }} />
                         <div className="flex-1">
-                          <p className="font-medium">Localisations préférées</p>
+                          <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Localisations préférées</p>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {matchingPrefs.preferred_locations.map((loc, idx) => (
-                              <Badge key={idx} variant="outline">
+                              <Badge key={idx} variant="outline" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}>
                                 {loc}
                               </Badge>
                             ))}
@@ -527,15 +527,15 @@ const AdminUserProfile = () => {
                     )}
                   {matchingPrefs.education_preference && (
                     <div className="flex justify-between">
-                      <span className="font-medium">Niveau d'éducation</span>
-                      <span className="text-muted-foreground capitalize">
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Niveau d'éducation</span>
+                      <span className="capitalize" style={{ color: 'var(--color-text-secondary)' }}>
                         {matchingPrefs.education_preference}
                       </span>
                     </div>
                   )}
                 </div>
               ) : (
-                <p className="text-muted-foreground">Aucun critère de recherche défini</p>
+                <p style={{ color: 'var(--color-text-muted)' }}>Aucun critère de recherche défini</p>
               )}
             </CardContent>
           </Card>
@@ -543,21 +543,21 @@ const AdminUserProfile = () => {
 
         {/* Privacy Settings Tab */}
         <TabsContent value="privacy">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Paramètres de confidentialité</CardTitle>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Paramètres de confidentialité</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {privacySettings ? (
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">Visibilité du profil</span>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Visibilité du profil</span>
                     <Badge variant="outline" className="capitalize">
                       {privacySettings.profile_visibility}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">Implication familiale</span>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Implication familiale</span>
                     <Badge
                       variant={privacySettings.allow_family_involvement ? 'default' : 'secondary'}
                     >
@@ -566,7 +566,7 @@ const AdminUserProfile = () => {
                   </div>
                   {privacySettings.photo_visibility && (
                     <div className="flex justify-between items-center">
-                      <span className="font-medium">Visibilité des photos</span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Visibilité des photos</span>
                       <Badge variant="outline" className="capitalize">
                         {privacySettings.photo_visibility}
                       </Badge>
@@ -574,7 +574,7 @@ const AdminUserProfile = () => {
                   )}
                 </div>
               ) : (
-                <p className="text-muted-foreground">Paramètres par défaut</p>
+                <p style={{ color: 'var(--color-text-muted)' }}>Paramètres par défaut</p>
               )}
             </CardContent>
           </Card>
@@ -582,15 +582,15 @@ const AdminUserProfile = () => {
 
         {/* Verification Tab */}
         <TabsContent value="verification">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Statut de vérification</CardTitle>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Statut de vérification</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {verification ? (
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">Email vérifié</span>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Email vérifié</span>
                     <Badge variant={verification.email_verified ? 'default' : 'secondary'}>
                       {verification.email_verified ? (
                         <CheckCircle className="h-3 w-3 mr-1" />
@@ -601,7 +601,7 @@ const AdminUserProfile = () => {
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">Téléphone vérifié</span>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Téléphone vérifié</span>
                     <Badge variant={verification.phone_verified ? 'default' : 'secondary'}>
                       {verification.phone_verified ? (
                         <CheckCircle className="h-3 w-3 mr-1" />
@@ -612,7 +612,7 @@ const AdminUserProfile = () => {
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">Identité vérifiée</span>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Identité vérifiée</span>
                     <Badge variant={verification.id_verified ? 'default' : 'secondary'}>
                       {verification.id_verified ? (
                         <CheckCircle className="h-3 w-3 mr-1" />
@@ -622,14 +622,14 @@ const AdminUserProfile = () => {
                       {verification.id_verified ? 'Vérifié' : 'Non vérifié'}
                     </Badge>
                   </div>
-                  <div className="pt-4 border-t">
+                  <div className="pt-4" style={{ borderTop: '1px solid var(--color-border-default)' }}>
                     <div className="flex justify-between items-center">
-                      <span className="font-medium">Score de vérification global</span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Score de vérification global</span>
                       <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
+                        <div className="w-32 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
                           <div
-                            className="h-full bg-gradient-to-r from-emerald to-gold transition-all"
-                            style={{ width: `${verification.verification_score}%` }}
+                            className="h-full transition-all"
+                            style={{ width: `${verification.verification_score}%`, backgroundColor: 'var(--color-primary)' }}
                           />
                         </div>
                         <span className="font-bold text-lg">
@@ -640,7 +640,7 @@ const AdminUserProfile = () => {
                   </div>
                 </div>
               ) : (
-                <p className="text-muted-foreground">Aucune vérification effectuée</p>
+                <p style={{ color: 'var(--color-text-muted)' }}>Aucune vérification effectuée</p>
               )}
             </CardContent>
           </Card>

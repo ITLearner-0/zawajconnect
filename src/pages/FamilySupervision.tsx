@@ -11,16 +11,16 @@ const FamilySupervision = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4">
+    <div className="min-h-screen p-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="h-12 w-12 bg-gradient-to-br from-emerald to-gold rounded-full flex items-center justify-center">
-            <Shield className="h-6 w-6 text-primary-foreground" />
+          <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)', borderRadius: 'var(--radius-full)' }}>
+            <Shield className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Supervision Familiale</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Supervision Familiale</h1>
+            <p style={{ color: 'var(--color-text-secondary)' }}>
               Gérez et supervisez les relations selon les principes islamiques
             </p>
           </div>

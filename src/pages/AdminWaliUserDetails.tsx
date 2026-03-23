@@ -66,31 +66,31 @@ const AdminWaliUserDetails = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-8 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <WaliAdminTabs />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
+          <Button variant="ghost" size="icon" asChild style={{ color: 'var(--color-text-secondary)' }}>
             <Link to="/admin/wali-permissions">
               <ArrowLeft className="w-5 h-5" />
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Détails de l'Administrateur</h1>
-            <p className="text-muted-foreground">Historique complet des permissions et actions</p>
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Détails de l'Administrateur</h1>
+            <p style={{ color: 'var(--color-text-muted)' }}>Historique complet des permissions et actions</p>
           </div>
         </div>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin" />
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--color-primary)' }} />
         </div>
       ) : !userPermission ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Aucune permission trouvée pour cet utilisateur</p>
-          <Button variant="outline" className="mt-4" asChild>
+          <p style={{ color: 'var(--color-text-muted)' }}>Aucune permission trouvée pour cet utilisateur</p>
+          <Button variant="outline" className="mt-4" asChild style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}>
             <Link to="/admin/wali-permissions">Retour à la liste</Link>
           </Button>
         </div>

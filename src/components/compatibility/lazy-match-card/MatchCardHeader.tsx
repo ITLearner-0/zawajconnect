@@ -26,7 +26,7 @@ const MatchCardHeader = ({
 }: MatchCardHeaderProps) => {
   const enhancedMatch = match as EnhancedCompatibilityMatch;
   const hasQualityMetrics = enhancedMatch.qualityMetrics !== undefined;
-  const profileImageSrc = match.profileData?.profile_picture;
+  const profileImageSrc = match.profileData?.avatar_url;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -75,7 +75,7 @@ const MatchCardHeader = ({
               {[
                 match.profileData.age ? `${match.profileData.age} years` : null,
                 match.profileData.location,
-                match.profileData.religious_practice_level,
+                match.profileData.religious_level,
               ]
                 .filter(Boolean)
                 .join(' • ')}

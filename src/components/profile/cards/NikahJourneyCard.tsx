@@ -1,5 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Heart, Check, Circle, ArrowRight } from 'lucide-react';
 
 interface JourneyStep {
@@ -41,53 +39,63 @@ const NikahJourneyCard = ({
   const progressPct = Math.round(((currentIdx >= 0 ? currentIdx : completedCount) / steps.length) * 100);
 
   return (
-    <Card className="dark:bg-gray-900 dark:border-gray-800">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <Heart className="h-4 w-4" />
+    <div
+      className="rounded-2xl"
+      style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+    >
+      <div className="p-4 pb-3">
+        <h3
+          className="text-base font-semibold flex items-center gap-2"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          <Heart className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
           Parcours vers le nikah
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+        </h3>
+      </div>
+      <div className="px-4 pb-4 space-y-3">
         <div className="space-y-1.5">
           {steps.map((step, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               {step.status === 'completed' ? (
-                <Check className="h-4 w-4 text-green-500 shrink-0" />
+                <Check className="h-4 w-4 shrink-0" style={{ color: 'var(--color-primary)' }} />
               ) : step.status === 'current' ? (
-                <ArrowRight className="h-4 w-4 text-amber-500 shrink-0" />
+                <ArrowRight className="h-4 w-4 shrink-0" style={{ color: 'var(--color-warning)' }} />
               ) : (
-                <Circle className="h-4 w-4 text-gray-300 dark:text-gray-600 shrink-0" />
+                <Circle className="h-4 w-4 shrink-0" style={{ color: 'var(--color-text-disabled)' }} />
               )}
               <span
-                className={
-                  step.status === 'completed'
-                    ? 'text-green-600 dark:text-green-400'
-                    : step.status === 'current'
-                      ? 'text-amber-600 dark:text-amber-400 font-medium'
-                      : 'text-muted-foreground'
-                }
+                style={{
+                  color:
+                    step.status === 'completed'
+                      ? 'var(--color-primary)'
+                      : step.status === 'current'
+                        ? 'var(--color-warning)'
+                        : 'var(--color-text-muted)',
+                  fontWeight: step.status === 'current' ? 500 : 400,
+                }}
               >
                 {step.label}
-                {step.label === 'Nikah' && ' ✨'}
               </span>
             </div>
           ))}
         </div>
 
         <div className="pt-2">
-          <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+          <div
+            className="rounded-full overflow-hidden"
+            style={{ height: 6, background: 'var(--color-border-subtle)' }}
+          >
             <div
-              className="h-full rounded-full bg-green-500 transition-all duration-500"
-              style={{ width: `${progressPct}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${progressPct}%`, background: 'var(--color-primary)' }}
             />
           </div>
-          <p className="text-xs text-muted-foreground mt-1 text-right">
+          <p className="text-xs mt-1 text-right" style={{ color: 'var(--color-text-muted)' }}>
             Étape {(currentIdx >= 0 ? currentIdx : completedCount) + 1} / {steps.length}
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
