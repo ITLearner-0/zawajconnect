@@ -50,8 +50,8 @@ const AdminWaliPermissions = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Chargement...</p>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <p style={{ color: 'var(--color-text-secondary)' }}>Chargement...</p>
       </div>
     );
   }
@@ -95,29 +95,29 @@ const AdminWaliPermissions = () => {
   });
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-8 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <WaliAdminTabs />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Shield className="w-8 h-8 text-primary" />
+          <Shield className="w-8 h-8" style={{ color: 'var(--color-primary)' }} />
           <div>
-            <h1 className="text-3xl font-bold">Gestion des Permissions</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Gestion des Permissions</h1>
+            <p style={{ color: 'var(--color-text-muted)' }}>
               Gérer les niveaux d'accès des administrateurs Wali
             </p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setSearchDialogOpen(true)}>
+          <Button variant="outline" onClick={() => setSearchDialogOpen(true)} style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}>
             <Search className="w-4 h-4 mr-2" />
             Rechercher
           </Button>
-          <Button variant="outline" onClick={() => setBulkDialogOpen(true)}>
+          <Button variant="outline" onClick={() => setBulkDialogOpen(true)} style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}>
             <UserPlus className="w-4 h-4 mr-2" />
             En masse
           </Button>
-          <Button onClick={() => setDialogOpen(true)}>
+          <Button onClick={() => setDialogOpen(true)} style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>
             <Plus className="w-4 h-4 mr-2" />
             Assigner
           </Button>
@@ -125,40 +125,40 @@ const AdminWaliPermissions = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Admins</CardTitle>
+            <CardTitle className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Total Admins</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{allPermissions.length}</div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{allPermissions.length}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Super Admins</CardTitle>
+            <CardTitle className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Super Admins</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
               {allPermissions.filter((p) => p.role === 'super_admin').length}
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Approbateurs</CardTitle>
+            <CardTitle className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Approbateurs</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
               {allPermissions.filter((p) => p.role === 'approver').length}
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Éditeurs</CardTitle>
+            <CardTitle className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Éditeurs</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
               {allPermissions.filter((p) => p.role === 'editor').length}
             </div>
           </CardContent>
@@ -181,10 +181,10 @@ const AdminWaliPermissions = () => {
             />
           </div>
 
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Permissions Actuelles</CardTitle>
-              <CardDescription>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Permissions Actuelles</CardTitle>
+              <CardDescription style={{ color: 'var(--color-text-muted)' }}>
                 Liste des administrateurs et leurs niveaux d'accès ({filteredPermissions.length})
               </CardDescription>
             </CardHeader>
@@ -252,9 +252,9 @@ const AdminWaliPermissions = () => {
         </TabsContent>
       </Tabs>
 
-      <Card>
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <CardHeader>
-          <CardTitle>Niveaux de Permission</CardTitle>
+          <CardTitle style={{ color: 'var(--color-text-primary)' }}>Niveaux de Permission</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">

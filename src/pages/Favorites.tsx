@@ -329,7 +329,7 @@ export default function Favorites() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProfiles.map((profile) => (
-              <Card key={profile.user_id} className="overflow-hidden relative">
+              <Card key={profile.user_id} className="overflow-hidden relative" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
                 {selectionMode && (
                   <div className="absolute top-2 left-2 z-10">
                     <Checkbox
@@ -357,7 +357,7 @@ export default function Favorites() {
                   />
                 </div>
 
-                <div className="p-4 border-t space-y-3">
+                <div className="p-4 space-y-3" style={{ borderTop: '1px solid var(--color-border-default)' }}>
                   <FavoriteTagSelector profileId={profile.user_id} />
 
                   {!selectionMode && (

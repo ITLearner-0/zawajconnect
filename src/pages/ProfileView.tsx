@@ -453,7 +453,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <StandardLoadingState message="Chargement du profil..." />
       </div>
     );
@@ -462,7 +462,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   // Error state - No profile found
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50">
+      <div className="min-h-screen">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Button
             variant="ghost"
@@ -495,7 +495,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8 max-w-7xl pb-24 lg:pb-8">
         {/* Back Button */}
         <motion.div

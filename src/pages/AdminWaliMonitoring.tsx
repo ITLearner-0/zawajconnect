@@ -72,7 +72,7 @@ const AdminWaliMonitoring = () => {
   }, [user]);
 
   if (isAdmin === null) {
-    return <div className="flex items-center justify-center min-h-screen">Chargement...</div>;
+    return <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)', color: 'var(--color-text-secondary)' }}>Chargement...</div>;
   }
 
   if (!user || !isAdmin) {
@@ -101,21 +101,21 @@ const AdminWaliMonitoring = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-8 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Shield className="w-8 h-8 text-primary" />
+            <Shield className="w-8 h-8" style={{ color: 'var(--color-primary)' }} />
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-3xl font-bold">Monitoring des Walis</h1>
+                <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Monitoring des Walis</h1>
                 <PermissionBadge role={permissions.role} />
               </div>
-              <p className="text-muted-foreground">
+              <p style={{ color: 'var(--color-text-muted)' }}>
                 Surveillance des activités et alertes de sécurité
                 {isConnected && (
-                  <span className="ml-2 inline-flex items-center gap-1 text-xs text-green-600">
-                    <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse" />
+                  <span className="ml-2 inline-flex items-center gap-1 text-xs" style={{ color: 'var(--color-success)' }}>
+                    <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-success)' }} />
                     Temps réel actif
                   </span>
                 )}
@@ -145,7 +145,7 @@ const AdminWaliMonitoring = () => {
           <TabsTrigger value="alerts">
             Alertes{' '}
             {unacknowledgedAlerts.length > 0 && (
-              <span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+              <span className="ml-2 px-2 py-0.5 text-xs rounded-full" style={{ backgroundColor: 'var(--color-danger)', color: '#fff' }}>
                 {unacknowledgedAlerts.length}
               </span>
             )}
