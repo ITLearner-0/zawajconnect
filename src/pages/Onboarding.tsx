@@ -735,8 +735,8 @@ const Onboarding = () => {
                   <User className="h-6 w-6 text-white" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold">Profil professionnel</h2>
-              <p className="text-muted-foreground">Votre parcours et personnalité</p>
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Profil professionnel</h2>
+              <p style={{ color: 'var(--color-text-muted)' }}>Votre parcours et personnalité</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -934,12 +934,12 @@ const Onboarding = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2 mb-8">
               <div className="flex justify-center">
-                <div className="h-12 w-12 bg-gradient-to-br from-gold to-gold-light rounded-full flex items-center justify-center">
+                <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-warning)' }}>
                   <Sparkles className="h-6 w-6 text-white" />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold">Vos attentes</h2>
-              <p className="text-muted-foreground">Décrivez votre partenaire idéal</p>
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Vos attentes</h2>
+              <p style={{ color: 'var(--color-text-muted)' }}>Décrivez votre partenaire idéal</p>
             </div>
 
             <div>

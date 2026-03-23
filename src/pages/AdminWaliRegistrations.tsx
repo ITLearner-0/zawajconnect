@@ -136,8 +136,8 @@ const AdminWaliRegistrations = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: 'var(--color-primary)' }} />
       </div>
     );
   }
@@ -153,14 +153,14 @@ const AdminWaliRegistrations = () => {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto py-8 px-4">
+    <div className="container max-w-7xl mx-auto py-8 px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Shield className="h-8 w-8 text-primary" />
+            <Shield className="h-8 w-8" style={{ color: 'var(--color-primary)' }} />
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-3xl font-bold">Gestion des Inscriptions Wali</h1>
+                <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Gestion des Inscriptions Wali</h1>
                 <PermissionBadge role={permissions.role} />
               </div>
               <p className="text-muted-foreground">
