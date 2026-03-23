@@ -239,7 +239,7 @@ const Messages = () => {
     return (
       <div className="flex items-center justify-center h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="text-center max-w-md p-6">
-          <div className="text-red-500 mb-4">
+          <div className="mb-4" style={{ color: 'var(--color-danger)' }}>
             <svg
               className="w-12 h-12 mx-auto"
               fill="none"
@@ -254,7 +254,7 @@ const Messages = () => {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
             Failed to Load Conversation
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{resolveError}</p>
