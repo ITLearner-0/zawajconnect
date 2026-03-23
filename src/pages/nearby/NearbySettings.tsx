@@ -30,7 +30,7 @@ const NearbySettings = ({
   return (
     <div className={isMobile ? 'w-full' : 'lg:col-span-1 space-y-6'}>
       <IslamicPattern variant="card" color="teal" className="overflow-hidden">
-        <div className="bg-islamic-teal text-white p-3 sm:p-4 flex items-center">
+        <div className="bg-emerald-600 text-white p-3 sm:p-4 flex items-center">
           <Filter className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
           <h2 className="text-lg sm:text-xl font-medium">{t('nearby.searchFilters')}</h2>
         </div>
@@ -40,7 +40,7 @@ const NearbySettings = ({
       </IslamicPattern>
 
       <IslamicPattern variant="gradient" className="p-4 sm:p-6 space-y-4">
-        <Label className="mb-3 block font-medium text-islamic-teal">
+        <Label className="mb-3 block font-medium text-emerald-700">
           {t('nearby.maxDistance')}: {maxDistance} {t('nearby.km')}
         </Label>
         <Slider
@@ -52,8 +52,8 @@ const NearbySettings = ({
           className="py-4"
         />
 
-        <div className="flex items-center justify-between pt-4 border-t border-islamic-sand">
-          <Label htmlFor="showCompatibility" className="text-islamic-blue font-medium">
+        <div className="flex items-center justify-between pt-4 border-t border-sage-200">
+          <Label htmlFor="showCompatibility" className="text-emerald-700 font-medium">
             {t('nearby.showCompatibility')}
           </Label>
           <Switch
@@ -65,7 +65,7 @@ const NearbySettings = ({
         </div>
 
         {!showCompatibility && (
-          <div className="text-sm text-islamic-burgundy bg-islamic-burgundy/10 p-3 rounded border border-islamic-burgundy/20 mt-2">
+          <div className="text-sm text-rose-700 bg-rose-50 p-3 rounded border border-rose-200 mt-2">
             {t('nearby.compatibilityTestRequired')}
           </div>
         )}

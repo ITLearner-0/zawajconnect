@@ -275,12 +275,12 @@ const FamilyAnalytics: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Messages Modérés</p>
                 <p className="text-2xl font-bold">{stats.moderatedMessages}</p>
-                <p className="text-sm text-blue-600 flex items-center gap-1">
+                <p className="text-sm text-emerald-600 flex items-center gap-1">
                   <Activity className="h-3 w-3" />
                   {stats.moderatedMessages > 0 ? 'Activité récente' : 'Calme'}
                 </p>
               </div>
-              <MessageSquare className="h-8 w-8 text-blue-600" />
+              <MessageSquare className="h-8 w-8 text-emerald-600" />
             </div>
           </CardContent>
         </Card>

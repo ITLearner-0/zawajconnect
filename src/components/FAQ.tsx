@@ -80,7 +80,7 @@ const FAQ = () => {
     {
       title: 'Communication et Sécurité',
       icon: <MessageCircle className="h-5 w-5" />,
-      color: 'bg-blue/10 text-blue-dark border-blue/20',
+      color: 'bg-emerald/10 text-emerald-dark border-emerald/20',
       questions: [
         {
           question: "Comment puis-je contacter quelqu'un qui m'intéresse ?",
@@ -107,7 +107,7 @@ const FAQ = () => {
     {
       title: 'Famille et Wali',
       icon: <Shield className="h-5 w-5" />,
-      color: 'bg-purple/10 text-purple-dark border-purple/20',
+      color: 'bg-rose/10 text-rose-dark border-rose/20',
       questions: [
         {
           question: 'Comment impliquer ma famille dans le processus ?',
@@ -225,7 +225,7 @@ const FAQ = () => {
           <Card className="text-center">
             <CardContent className="p-4">
               <div className="flex items-center justify-center mb-2">
-                <Shield className="h-6 w-6 text-blue-600" />
+                <Shield className="h-6 w-6 text-emerald-600" />
               </div>
               <div className="text-2xl font-bold text-foreground">100%</div>
               <div className="text-sm text-muted-foreground">Sécurisé</div>
