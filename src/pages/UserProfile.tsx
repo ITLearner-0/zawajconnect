@@ -221,7 +221,7 @@ const UserProfile = () => {
   const isOwnProfile = currentUserId === id;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-8">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto px-4 max-w-4xl">
         <StandardLoadingState
           loading={loading}
@@ -250,7 +250,7 @@ const UserProfile = () => {
                 <div className="mb-6 text-center">
                   <Button
                     onClick={handleEditMyProfile}
-                    className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white"
+                    style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                   >
                     <User className="mr-2 h-4 w-4" />
                     Modifier Mon Profil

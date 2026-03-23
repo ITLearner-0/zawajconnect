@@ -55,10 +55,10 @@ const AdminWaliAlertsPage = () => {
 
   if (roleLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="animate-pulse space-y-4">
-          <div className="h-8 w-64 bg-muted rounded" />
-          <div className="h-4 w-96 bg-muted rounded" />
+          <div className="h-8 w-64 rounded" style={{ backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-md)' }} />
+          <div className="h-4 w-96 rounded" style={{ backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-md)' }} />
         </div>
       </div>
     );
@@ -79,20 +79,20 @@ const AdminWaliAlertsPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} style={{ color: 'var(--color-text-secondary)' }}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Alertes Wali</h1>
-            <p className="text-muted-foreground">Gestion centralisée des alertes de sécurité</p>
+            <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Alertes Wali</h1>
+            <p style={{ color: 'var(--color-text-muted)' }}>Gestion centralisée des alertes de sécurité</p>
           </div>
         </div>
-        <Button onClick={loadData} disabled={refreshing || loading} variant="outline" size="sm">
+        <Button onClick={loadData} disabled={refreshing || loading} variant="outline" size="sm" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}>
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
           Actualiser
         </Button>

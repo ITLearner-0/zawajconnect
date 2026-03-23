@@ -176,7 +176,8 @@ export default function BadgeLeaderboard() {
             {entry.legendary_count > 0 && (
               <Badge
                 variant="outline"
-                className="text-xs bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50"
+                className="text-xs"
+                style={{ backgroundColor: 'var(--color-accent-light)', borderColor: 'var(--color-accent-border)', color: 'var(--color-accent)' }}
               >
                 <Crown className="w-3 h-3 mr-1" />
                 {entry.legendary_count} Legendary
@@ -185,7 +186,8 @@ export default function BadgeLeaderboard() {
             {entry.epic_count > 0 && (
               <Badge
                 variant="outline"
-                className="text-xs bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/30"
+                className="text-xs"
+                style={{ backgroundColor: 'var(--color-primary-light)', borderColor: 'var(--color-primary-border)', color: 'var(--color-primary)' }}
               >
                 {entry.epic_count} Epic
               </Badge>

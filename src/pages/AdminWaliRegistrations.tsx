@@ -163,7 +163,7 @@ const AdminWaliRegistrations = () => {
                 <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Gestion des Inscriptions Wali</h1>
                 <PermissionBadge role={permissions.role} />
               </div>
-              <p className="text-muted-foreground">
+              <p style={{ color: 'var(--color-text-muted)' }}>
                 Approuvez ou rejetez les demandes d'inscription en tant que Wali après vérification
                 des documents
               </p>
@@ -218,51 +218,51 @@ const AdminWaliRegistrations = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="pb-2">
-            <CardDescription>Total</CardDescription>
-            <CardTitle className="text-2xl">{filteredRegistrations.length}</CardTitle>
+            <CardDescription style={{ color: 'var(--color-text-muted)' }}>Total</CardDescription>
+            <CardTitle className="text-2xl" style={{ color: 'var(--color-text-primary)' }}>{filteredRegistrations.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-xs text-muted-foreground">
+            <div className="flex items-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
               <Eye className="mr-1 h-3 w-3" />
               Toutes inscriptions
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="pb-2">
-            <CardDescription>En attente</CardDescription>
-            <CardTitle className="text-2xl">{pendingCount}</CardTitle>
+            <CardDescription style={{ color: 'var(--color-text-muted)' }}>En attente</CardDescription>
+            <CardTitle className="text-2xl" style={{ color: 'var(--color-text-primary)' }}>{pendingCount}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-xs text-yellow-600">
+            <div className="flex items-center text-xs" style={{ color: 'var(--color-warning)' }}>
               <Clock className="mr-1 h-3 w-3" />À traiter
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="pb-2">
-            <CardDescription>Approuvées</CardDescription>
-            <CardTitle className="text-2xl">{approvedCount}</CardTitle>
+            <CardDescription style={{ color: 'var(--color-text-muted)' }}>Approuvées</CardDescription>
+            <CardTitle className="text-2xl" style={{ color: 'var(--color-text-primary)' }}>{approvedCount}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-xs text-success">
+            <div className="flex items-center text-xs" style={{ color: 'var(--color-success)' }}>
               <CheckCircle2 className="mr-1 h-3 w-3" />
               Validées
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader className="pb-2">
-            <CardDescription>Rejetées</CardDescription>
-            <CardTitle className="text-2xl">{rejectedCount}</CardTitle>
+            <CardDescription style={{ color: 'var(--color-text-muted)' }}>Rejetées</CardDescription>
+            <CardTitle className="text-2xl" style={{ color: 'var(--color-text-primary)' }}>{rejectedCount}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-xs text-destructive">
+            <div className="flex items-center text-xs" style={{ color: 'var(--color-danger)' }}>
               <XCircle className="mr-1 h-3 w-3" />
               Refusées
             </div>
@@ -271,10 +271,10 @@ const AdminWaliRegistrations = () => {
       </div>
 
       {/* Tabs for filtering */}
-      <Card>
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <CardHeader>
-          <CardTitle>Liste des inscriptions</CardTitle>
-          <CardDescription>
+          <CardTitle style={{ color: 'var(--color-text-primary)' }}>Liste des inscriptions</CardTitle>
+          <CardDescription style={{ color: 'var(--color-text-muted)' }}>
             Cliquez sur "Voir" pour examiner les détails et documents de chaque candidat
           </CardDescription>
         </CardHeader>
@@ -285,7 +285,7 @@ const AdminWaliRegistrations = () => {
               <TabsTrigger value="pending" className="relative">
                 En attente
                 {pendingCount > 0 && (
-                  <span className="ml-2 bg-yellow-500 text-white text-xs rounded-full px-2 py-0.5">
+                  <span className="ml-2 text-xs rounded-full px-2 py-0.5" style={{ backgroundColor: 'var(--color-warning)', color: '#fff' }}>
                     {pendingCount}
                   </span>
                 )}

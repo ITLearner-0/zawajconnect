@@ -4,10 +4,10 @@ import FamilyDataProtection from '@/components/security/FamilyDataProtection';
 
 const SecurityAdmin = () => {
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Sécurité & Protection des données</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Sécurité & Protection des données</h1>
+        <p style={{ color: 'var(--color-text-muted)' }}>
           Gérez la sécurité de votre compte et la protection des données familiales
         </p>
       </div>

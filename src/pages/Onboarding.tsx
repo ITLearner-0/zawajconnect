@@ -711,7 +711,7 @@ const Onboarding = () => {
               <div>
                 <Label htmlFor="location">Localisation *</Label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                   <Input
                     id="location"
                     value={profileData.location}
@@ -866,7 +866,7 @@ const Onboarding = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleSkipSection('interests')}
-                    className="text-muted-foreground"
+                    style={{ color: 'var(--color-text-muted)' }}
                   >
                     Je compléterai plus tard
                   </Button>
@@ -885,7 +885,7 @@ const Onboarding = () => {
                   <Button
                     variant="ghost"
                     onClick={() => handleSkipSection('photo')}
-                    className="text-muted-foreground"
+                    style={{ color: 'var(--color-text-muted)' }}
                   >
                     Je compléterai plus tard
                   </Button>
@@ -974,13 +974,13 @@ const Onboarding = () => {
               </Select>
             </div>
 
-            <Card className="bg-emerald/5 border-emerald/20">
+            <Card style={{ backgroundColor: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)', borderRadius: 'var(--radius-lg)' }}>
               <CardContent className="p-4">
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-emerald mt-0.5" />
+                  <CheckCircle className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-success)' }} />
                   <div>
-                    <h4 className="font-medium text-emerald">Profil presque terminé !</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <h4 className="font-medium" style={{ color: 'var(--color-success)' }}>Profil presque terminé !</h4>
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
                       Une fois votre profil validé, vous pourrez découvrir des personnes compatibles
                       selon vos valeurs islamiques.
                     </p>
@@ -1091,7 +1091,7 @@ const Onboarding = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center space-x-3">
-                      <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center text-white">
+                      <div className="h-10 w-10 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: 'var(--color-primary)' }}>
                         {steps[currentStep - 1]?.icon}
                       </div>
                       <span>{steps[currentStep - 1]?.title}</span>
@@ -1134,7 +1134,8 @@ const Onboarding = () => {
                       <Button
                         onClick={completeOnboarding}
                         disabled={loading || !isStepValid()}
-                        className="bg-gradient-to-r from-emerald to-emerald-dark hover:from-emerald-dark hover:to-emerald text-white flex items-center space-x-2"
+                        className="flex items-center space-x-2"
+                        style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                       >
                         {saving ? (
                           <>
@@ -1152,7 +1153,8 @@ const Onboarding = () => {
                       <Button
                         onClick={nextStep}
                         disabled={!isStepValid()}
-                        className="bg-emerald hover:bg-emerald-dark text-white flex items-center space-x-2"
+                        className="flex items-center space-x-2"
+                        style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                       >
                         <span>Suivant</span>
                         <ArrowRight className="h-4 w-4" />
