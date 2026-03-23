@@ -27,7 +27,7 @@ const Compatibility = () => {
                   viviez en tranquillité avec elles et Il a mis entre vous de l'affection et de la
                   bonté." - Coran 30:21
                 </p>
-                <p className="text-rose-700 dark:text-rose-300">
+                <p style={{ color: 'var(--color-text-secondary)' }}>
                   Répondez honnêtement à chaque question pour évaluer votre compatibilité avec de
                   futurs partenaires selon les valeurs islamiques. Ce test vous aidera à trouver des
                   personnes qui partagent vos principes religieux et vos objectifs de vie.
@@ -38,8 +38,8 @@ const Compatibility = () => {
             <CompatibilityTest />
 
             <div className="mt-8 text-center">
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-lg border border-emerald-200 dark:border-emerald-700 max-w-2xl mx-auto">
-                <p className="text-sm text-emerald-700 dark:text-emerald-300">
+              <div className="p-4 max-w-2xl mx-auto" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   <strong>Important :</strong> Aucun couple n'est parfait. L'important est la
                   volonté commune de s'améliorer et de plaire à Allah dans votre mariage. N'hésitez
                   pas à chercher des conseils auprès d'imams ou de sages pour approfondir votre

@@ -65,10 +65,10 @@ const WaliSetup: React.FC = () => {
     <AuthLayout isSignUp={true}>
       <div className="space-y-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-primary mb-2">
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
             Inscription en tant que Wali (Tuteur)
           </h2>
-          <p className="text-muted-foreground">
+          <p style={{ color: 'var(--color-text-secondary)' }}>
             Créez votre compte pour superviser et guider les conversations matrimoniales islamiques
           </p>
         </div>
@@ -76,9 +76,9 @@ const WaliSetup: React.FC = () => {
         <WaliSignUpForm loading={loading} onSubmit={handleWaliSignUp} />
 
         <div className="text-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Vous avez déjà un compte ?{' '}
-            <button onClick={() => navigate('/auth')} className="text-primary hover:underline">
+            <button onClick={() => navigate('/auth')} style={{ color: 'var(--color-primary)' }} className="hover:underline">
               Connectez-vous ici
             </button>
           </p>

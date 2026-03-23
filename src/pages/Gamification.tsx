@@ -28,10 +28,10 @@ const GamificationPage = () => {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto py-8 px-4">
+    <div className="container max-w-7xl mx-auto py-8 px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Achievements & Rewards</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Achievements & Rewards</h1>
+        <p style={{ color: 'var(--color-text-muted)' }}>
           Track your badges, claim rewards, and view your progress
         </p>
       </div>

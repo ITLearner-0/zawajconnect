@@ -96,24 +96,25 @@ const AdminUsers = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <Card>
+    <div className="container mx-auto py-8 px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UserCog className="h-6 w-6" />
+          <CardTitle className="flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
+            <UserCog className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
             Gestion des Utilisateurs
           </CardTitle>
-          <CardDescription>Gérez les utilisateurs, leurs rôles et permissions</CardDescription>
+          <CardDescription style={{ color: 'var(--color-text-muted)' }}>Gérez les utilisateurs, leurs rôles et permissions</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
               <Input
                 placeholder="Rechercher par nom ou email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
+                style={{ borderColor: 'var(--color-border-default)', borderRadius: 'var(--radius-md)' }}
               />
             </div>
           </div>
@@ -121,7 +122,7 @@ const AdminUsers = () => {
           {isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={i} className="flex items-center justify-between p-4 rounded-lg" style={{ border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)' }}>
                   <div className="flex items-center gap-4">
                     <Skeleton className="h-12 w-12 rounded-full" />
                     <div className="space-y-2">
@@ -138,11 +139,14 @@ const AdminUsers = () => {
               {users.map((user) => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-4 transition-colors cursor-pointer"
+                  style={{ border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                   onClick={() => navigate(`/admin/user/${user.id}`)}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary-light)' }}>
                       {user.avatar_url ? (
                         <img
                           src={user.avatar_url}
@@ -150,7 +154,7 @@ const AdminUsers = () => {
                           className="h-12 w-12 rounded-full object-cover"
                         />
                       ) : (
-                        <span className="text-lg font-semibold text-primary">
+                        <span className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>
                           {user.full_name
                             ?.split(' ')
                             .map((n) => n[0])
@@ -160,9 +164,9 @@ const AdminUsers = () => {
                       )}
                     </div>
                     <div>
-                      <div className="font-medium">{user.full_name || 'Nom non renseigné'}</div>
-                      <div className="text-sm text-muted-foreground">{user.email}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{user.full_name || 'Nom non renseigné'}</div>
+                      <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{user.email}</div>
+                      <div className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
                         Inscrit le {new Date(user.created_at).toLocaleDateString('fr-FR')}
                       </div>
                     </div>
@@ -172,7 +176,7 @@ const AdminUsers = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-12" style={{ color: 'var(--color-text-muted)' }}>
               <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Aucun utilisateur trouvé</p>
             </div>

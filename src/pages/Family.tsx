@@ -304,11 +304,11 @@ const Family = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/10 to-emerald/5 p-4">
+      <div className="min-h-screen p-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="container mx-auto max-w-4xl">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-muted rounded w-1/3"></div>
-            <div className="h-96 bg-muted rounded"></div>
+            <div className="h-8 rounded w-1/3" style={{ backgroundColor: 'var(--color-bg-subtle)' }}></div>
+            <div className="h-96 rounded" style={{ backgroundColor: 'var(--color-bg-subtle)' }}></div>
           </div>
         </div>
       </div>
@@ -316,16 +316,16 @@ const Family = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/10 to-emerald/5 p-4">
+    <div className="min-h-screen p-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto max-w-4xl">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="h-12 w-12 bg-gradient-to-br from-gold to-gold-light rounded-full flex items-center justify-center">
+          <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)', borderRadius: 'var(--radius-full)' }}>
             <Users className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Implication Familiale</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Implication Familiale</h1>
+            <p style={{ color: 'var(--color-text-secondary)' }}>
               Gérez la participation de votre famille dans votre recherche matrimoniale
             </p>
           </div>
@@ -370,7 +370,7 @@ const Family = () => {
               <CardContent className="space-y-4">
                 {/* Add Member Form */}
                 {showAddForm && (
-                  <Card className="border-emerald/20 bg-emerald/5">
+                  <Card style={{ backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)' }}>
                     <CardHeader>
                       <CardTitle className="text-lg">Ajouter un nouveau membre</CardTitle>
                     </CardHeader>
@@ -409,8 +409,8 @@ const Family = () => {
                         </div>
                       </div>
 
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                        <p className="text-sm text-amber-700">
+                      <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning-border)', borderRadius: 'var(--radius-md)' }}>
+                        <p className="text-sm" style={{ color: 'var(--color-warning)' }}>
                           💡 <strong>Astuce:</strong> Utilisez l'onglet "Membres famille" puis
                           "Inviter un membre" pour envoyer une invitation par email avec accès
                           complet.
@@ -488,7 +488,7 @@ const Family = () => {
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <div className="h-12 w-12 bg-gradient-to-br from-sage to-sage-dark rounded-full flex items-center justify-center">
+                              <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
                                 <span className="text-white font-bold">
                                   {member.full_name.charAt(0)}
                                 </span>
@@ -498,7 +498,7 @@ const Family = () => {
                                 <div className="flex items-center gap-2 mb-1">
                                   <h3 className="font-semibold">{member.full_name}</h3>
                                   {member.is_wali && (
-                                    <Badge className="bg-gold/10 text-gold border-gold/20">
+                                    <Badge style={{ backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)', borderColor: 'var(--color-warning-border)' }}>
                                       <Crown className="h-3 w-3 mr-1" />
                                       Wali
                                     </Badge>

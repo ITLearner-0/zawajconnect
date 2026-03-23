@@ -548,11 +548,11 @@ const Compare = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+      <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="container mx-auto max-w-6xl">
-          <Card className="animate-pulse">
+          <Card className="animate-pulse" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardContent className="p-8">
-              <div className="h-64 bg-muted rounded"></div>
+              <div className="h-64 rounded" style={{ backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-md)' }}></div>
             </CardContent>
           </Card>
         </div>
@@ -561,23 +561,23 @@ const Compare = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Historique des Comparaisons</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Historique des Comparaisons</h1>
+            <p style={{ color: 'var(--color-text-muted)' }}>
               Retrouvez toutes vos comparaisons de profils précédentes
             </p>
           </div>
           <Button
             variant={showStatistics ? 'default' : 'outline'}
             onClick={() => setShowStatistics(!showStatistics)}
-            className={
+            style={
               showStatistics
-                ? 'bg-emerald text-white'
-                : 'border-emerald text-emerald hover:bg-emerald hover:text-white'
+                ? { backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }
+                : { borderColor: 'var(--color-primary)', color: 'var(--color-primary)', borderRadius: 'var(--radius-md)' }
             }
           >
             <BarChart3 className="h-4 w-4 mr-2" />

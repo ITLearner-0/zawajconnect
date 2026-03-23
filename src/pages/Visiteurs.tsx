@@ -140,23 +140,23 @@ const Visiteurs = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <StandardLoadingState message="Chargement des visiteurs..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-            <Eye className="h-5 w-5 text-emerald-600" />
+          <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary-light)' }}>
+            <Eye className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Visiteurs</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Visiteurs</h1>
+            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               {visitors.length > 0
                 ? `${visitors.length} personne${visitors.length > 1 ? 's' : ''} ont consulté votre profil`
                 : 'Personne n\'a encore visité votre profil'}
@@ -169,13 +169,13 @@ const Visiteurs = () => {
           <Card className="text-center py-12">
             <CardContent>
               <Users className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
+              <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
                 Aucun visiteur pour le moment
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
                 Complétez votre profil et soyez actif pour attirer plus de visiteurs.
               </p>
-              <Button onClick={() => navigate('/browse')}>
+              <Button onClick={() => navigate('/browse')} style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>
                 Découvrir des profils
               </Button>
             </CardContent>
@@ -198,10 +198,11 @@ const Visiteurs = () => {
                       <img
                         src={visitor.profile.profile_picture}
                         alt=""
-                        className="h-14 w-14 rounded-full object-cover border-2 border-emerald-100"
+                        className="h-14 w-14 rounded-full object-cover border-2"
+                        style={{ borderColor: 'var(--color-primary-light)' }}
                       />
                     ) : (
-                      <div className="h-14 w-14 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
+                      <div className="h-14 w-14 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--color-primary)' }}>
                         <span className="text-lg text-white font-bold">
                           {visitor.profile?.full_name?.charAt(0) || '?'}
                         </span>

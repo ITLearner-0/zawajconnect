@@ -264,10 +264,10 @@ const AdminUserProfile = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Chargement du profil...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+          <p style={{ color: 'var(--color-text-secondary)' }}>Chargement du profil...</p>
         </div>
       </div>
     );
@@ -275,14 +275,14 @@ const AdminUserProfile = () => {
 
   if (!profile) {
     return (
-      <div className="container mx-auto py-8">
-        <Card>
+      <div className="container mx-auto py-8" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardHeader>
-            <CardTitle>Profil non trouvé</CardTitle>
-            <CardDescription>L'utilisateur demandé n'existe pas</CardDescription>
+            <CardTitle style={{ color: 'var(--color-text-primary)' }}>Profil non trouvé</CardTitle>
+            <CardDescription style={{ color: 'var(--color-text-muted)' }}>L'utilisateur demandé n'existe pas</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate('/admin')}>
+            <Button onClick={() => navigate('/admin')} style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour à l'administration
             </Button>
@@ -293,28 +293,28 @@ const AdminUserProfile = () => {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto py-6 space-y-6" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate('/admin')}>
+        <Button variant="ghost" onClick={() => navigate('/admin')} style={{ color: 'var(--color-text-secondary)' }}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à l'administration
         </Button>
       </div>
 
       {/* Profile Header */}
-      <Card>
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-6">
             <Avatar className="h-24 w-24">
               <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
-              <AvatarFallback className="text-2xl">
+              <AvatarFallback className="text-2xl" style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
                 {profile.full_name?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 space-y-2">
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold">{profile.full_name}</h1>
+                <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{profile.full_name}</h1>
                 {verification && (
                   <Badge variant={verification.verification_score >= 80 ? 'default' : 'secondary'}>
                     <Shield className="h-3 w-3 mr-1" />
@@ -322,7 +322,7 @@ const AdminUserProfile = () => {
                   </Badge>
                 )}
               </div>
-              <div className="flex flex-wrap gap-4 text-muted-foreground">
+              <div className="flex flex-wrap gap-4" style={{ color: 'var(--color-text-secondary)' }}>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span>{profile.age} ans</span>
@@ -336,7 +336,7 @@ const AdminUserProfile = () => {
                   <span className="capitalize">{profile.gender}</span>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 Inscrit le {new Date(profile.created_at).toLocaleDateString('fr-FR')}
               </p>
             </div>
@@ -346,35 +346,35 @@ const AdminUserProfile = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-emerald" />
+              <Heart className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
               <div>
-                <p className="text-sm text-muted-foreground">Matches Total</p>
-                <p className="text-2xl font-bold">{stats.totalMatches}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Matches Total</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{stats.totalMatches}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-gold" />
+              <MessageCircle className="h-5 w-5" style={{ color: 'var(--color-warning)' }} />
               <div>
-                <p className="text-sm text-muted-foreground">Conversations actives</p>
-                <p className="text-2xl font-bold">{stats.activeConversations}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Conversations actives</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{stats.activeConversations}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-primary" />
+              <MessageCircle className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
               <div>
-                <p className="text-sm text-muted-foreground">Messages envoyés</p>
-                <p className="text-2xl font-bold">{stats.totalMessages}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Messages envoyés</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{stats.totalMessages}</p>
               </div>
             </div>
           </CardContent>

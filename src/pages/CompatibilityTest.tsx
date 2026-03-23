@@ -60,8 +60,8 @@ const CompatibilityTest = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <div className="animate-spin rounded-full h-8 w-8" style={{ borderBottom: '2px solid var(--color-primary)' }}></div>
       </div>
     );
   }
@@ -76,7 +76,7 @@ const CompatibilityTest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <Header />
       <main className="pt-20">
         <ErrorBoundaryWrapper>

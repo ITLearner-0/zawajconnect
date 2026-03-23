@@ -54,45 +54,45 @@ const CompatibilityDeepDive = () => {
   const overallScore = 84;
 
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6 max-w-5xl">
+    <div className="container mx-auto py-6 px-4 space-y-6 max-w-5xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-rose-400 to-pink-600 text-white mb-2">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full text-white mb-2" style={{ backgroundColor: 'var(--color-primary)' }}>
           <TrendingUp className="h-8 w-8" />
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
           Analyse de Compatibilité
         </h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">
+        <p style={{ color: 'var(--color-text-muted)' }} className="max-w-xl mx-auto">
           Rapport détaillé et narratif de votre compatibilité avec Fatima A.
         </p>
       </div>
 
       {/* Overall Score */}
-      <Card className="border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
+      <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '2px solid var(--color-primary-border)', borderRadius: 'var(--radius-lg)' }}>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
-              <div className="w-32 h-32 rounded-full border-8 border-emerald-500 flex items-center justify-center bg-white">
+              <div className="w-32 h-32 rounded-full flex items-center justify-center" style={{ border: '8px solid var(--color-primary)', backgroundColor: 'var(--color-bg-card)' }}>
                 <div className="text-center">
-                  <span className="text-4xl font-bold text-emerald-600">{overallScore}</span>
-                  <span className="text-sm text-emerald-600">%</span>
+                  <span className="text-4xl font-bold" style={{ color: 'var(--color-primary)' }}>{overallScore}</span>
+                  <span className="text-sm" style={{ color: 'var(--color-primary)' }}>%</span>
                 </div>
               </div>
-              <div className="absolute -top-2 -right-2 bg-emerald-500 text-white rounded-full p-1.5">
+              <div className="absolute -top-2 -right-2 text-white rounded-full p-1.5" style={{ backgroundColor: 'var(--color-primary)' }}>
                 <Sparkles className="h-4 w-4" />
               </div>
             </div>
             <div className="text-center md:text-left">
-              <h2 className="text-xl font-bold text-emerald-800">Excellente compatibilité</h2>
-              <p className="text-emerald-700 mt-1">
+              <h2 className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>Excellente compatibilité</h2>
+              <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                 Vous et Fatima partagez des valeurs profondes et une vision commune de la vie conjugale.
                 Quelques points méritent discussion pour renforcer votre entente.
               </p>
               <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
-                <Badge className="bg-emerald-100 text-emerald-700">3 points forts</Badge>
-                <Badge className="bg-amber-100 text-amber-700">2 points d'attention</Badge>
-                <Badge className="bg-orange-100 text-orange-700">1 défi</Badge>
+                <Badge style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}>3 points forts</Badge>
+                <Badge style={{ backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}>2 points d'attention</Badge>
+                <Badge style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)' }}>1 défi</Badge>
               </div>
             </div>
           </div>
@@ -109,9 +109,9 @@ const CompatibilityDeepDive = () => {
 
         {/* Radar Chart */}
         <TabsContent value="radar">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle className="text-lg">Radar de compatibilité</CardTitle>
+              <CardTitle className="text-lg" style={{ color: 'var(--color-text-primary)' }}>Radar de compatibilité</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
@@ -126,9 +126,9 @@ const CompatibilityDeepDive = () => {
               </ResponsiveContainer>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
                 {radarData.map((d) => (
-                  <div key={d.subject} className="text-center p-3 rounded-lg bg-gray-50">
-                    <p className="text-xs text-muted-foreground">{d.subject}</p>
-                    <p className="text-lg font-bold text-emerald-600">
+                  <div key={d.subject} className="text-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-md)' }}>
+                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{d.subject}</p>
+                    <p className="text-lg font-bold" style={{ color: 'var(--color-primary)' }}>
                       {Math.round((d.you + d.partner) / 2)}%
                     </p>
                   </div>
@@ -142,22 +142,22 @@ const CompatibilityDeepDive = () => {
         <TabsContent value="narrative" className="space-y-4">
           {/* Strengths */}
           <div>
-            <h3 className="text-lg font-semibold text-emerald-700 mb-3 flex items-center gap-2">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-success)' }}>
               <CheckCircle2 className="h-5 w-5" /> Points Forts
             </h3>
             <div className="space-y-3">
               {strengths.map((s, i) => {
                 const Icon = s.icon;
                 return (
-                  <Card key={i} className="border-emerald-200 bg-emerald-50/50">
+                  <Card key={i} style={{ backgroundColor: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)', borderRadius: 'var(--radius-lg)' }}>
                     <CardContent className="pt-4 pb-4">
                       <div className="flex gap-3">
-                        <div className="p-2 rounded-lg bg-emerald-100 h-fit">
-                          <Icon className="h-5 w-5 text-emerald-600" />
+                        <div className="p-2 h-fit" style={{ backgroundColor: 'var(--color-primary-muted)', borderRadius: 'var(--radius-md)' }}>
+                          <Icon className="h-5 w-5" style={{ color: 'var(--color-success)' }} />
                         </div>
                         <div>
-                          <p className="font-medium text-emerald-800">{s.title}</p>
-                          <p className="text-sm text-emerald-700 mt-1">{s.description}</p>
+                          <p className="font-medium" style={{ color: 'var(--color-primary)' }}>{s.title}</p>
+                          <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>{s.description}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -169,22 +169,22 @@ const CompatibilityDeepDive = () => {
 
           {/* Attention Points */}
           <div>
-            <h3 className="text-lg font-semibold text-amber-700 mb-3 flex items-center gap-2">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-warning)' }}>
               <AlertTriangle className="h-5 w-5" /> Points d'Attention
             </h3>
             <div className="space-y-3">
               {attentionPoints.map((s, i) => {
                 const Icon = s.icon;
                 return (
-                  <Card key={i} className="border-amber-200 bg-amber-50/50">
+                  <Card key={i} style={{ backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning-border)', borderRadius: 'var(--radius-lg)' }}>
                     <CardContent className="pt-4 pb-4">
                       <div className="flex gap-3">
-                        <div className="p-2 rounded-lg bg-amber-100 h-fit">
-                          <Icon className="h-5 w-5 text-amber-600" />
+                        <div className="p-2 h-fit" style={{ backgroundColor: 'var(--color-warning-bg)', borderRadius: 'var(--radius-md)' }}>
+                          <Icon className="h-5 w-5" style={{ color: 'var(--color-warning)' }} />
                         </div>
                         <div>
-                          <p className="font-medium text-amber-800">{s.title}</p>
-                          <p className="text-sm text-amber-700 mt-1">{s.description}</p>
+                          <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{s.title}</p>
+                          <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>{s.description}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -196,22 +196,22 @@ const CompatibilityDeepDive = () => {
 
           {/* Challenges */}
           <div>
-            <h3 className="text-lg font-semibold text-orange-700 mb-3 flex items-center gap-2">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-danger)' }}>
               <Target className="h-5 w-5" /> Défis Potentiels
             </h3>
             <div className="space-y-3">
               {challenges.map((s, i) => {
                 const Icon = s.icon;
                 return (
-                  <Card key={i} className="border-orange-200 bg-orange-50/50">
+                  <Card key={i} style={{ backgroundColor: 'var(--color-danger-bg)', border: '1px solid var(--color-danger-border)', borderRadius: 'var(--radius-lg)' }}>
                     <CardContent className="pt-4 pb-4">
                       <div className="flex gap-3">
-                        <div className="p-2 rounded-lg bg-orange-100 h-fit">
-                          <Icon className="h-5 w-5 text-orange-600" />
+                        <div className="p-2 h-fit" style={{ backgroundColor: 'var(--color-danger-bg)', borderRadius: 'var(--radius-md)' }}>
+                          <Icon className="h-5 w-5" style={{ color: 'var(--color-danger)' }} />
                         </div>
                         <div>
-                          <p className="font-medium text-orange-800">{s.title}</p>
-                          <p className="text-sm text-orange-700 mt-1">{s.description}</p>
+                          <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{s.title}</p>
+                          <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>{s.description}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -224,30 +224,31 @@ const CompatibilityDeepDive = () => {
 
         {/* Timeline */}
         <TabsContent value="timeline">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle className="text-lg">Parcours de découverte</CardTitle>
+              <CardTitle className="text-lg" style={{ color: 'var(--color-text-primary)' }}>Parcours de découverte</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-0">
                 {timeline.map((step, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        step.completed ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'
-                      }`}>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{
+                        backgroundColor: step.completed ? 'var(--color-primary)' : 'var(--color-bg-subtle)',
+                        color: step.completed ? '#fff' : 'var(--color-text-muted)'
+                      }}>
                         {step.completed ? <CheckCircle2 className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
                       </div>
                       {i < timeline.length - 1 && (
-                        <div className={`w-0.5 h-16 ${step.completed ? 'bg-emerald-300' : 'bg-gray-200'}`} />
+                        <div className="w-0.5 h-16" style={{ backgroundColor: step.completed ? 'var(--color-primary-muted)' : 'var(--color-border-subtle)' }} />
                       )}
                     </div>
                     <div className="pb-8">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium">{step.label}</p>
+                        <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{step.label}</p>
                         <Badge variant="outline" className="text-xs">{step.date}</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">{step.insight}</p>
+                      <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>{step.insight}</p>
                     </div>
                   </div>
                 ))}
@@ -258,38 +259,38 @@ const CompatibilityDeepDive = () => {
 
         {/* Actions */}
         <TabsContent value="actions" className="space-y-4">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-blue-500" />
+              <CardTitle className="text-lg flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
+                <MessageCircle className="h-5 w-5" style={{ color: 'var(--color-accent)' }} />
                 Questions à poser
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {suggestedQuestions.map((q, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
-                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  <div key={i} className="flex items-start gap-3 p-3" style={{ backgroundColor: 'var(--color-accent-light)', border: '1px solid var(--color-accent-border)', borderRadius: 'var(--radius-md)' }}>
+                    <div className="w-6 h-6 rounded-full text-white flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ backgroundColor: 'var(--color-accent)' }}>
                       {i + 1}
                     </div>
-                    <p className="text-sm text-blue-800">{q}</p>
+                    <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{q}</p>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Target className="h-5 w-5 text-purple-500" />
+              <CardTitle className="text-lg flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
+                <Target className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
                 Sujets à approfondir
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {['Gestion financière', 'Relations belle-famille', 'Rythme de vie', 'Lieu de résidence'].map((topic) => (
-                  <Button key={topic} variant="outline" className="justify-between h-auto py-3">
+                  <Button key={topic} variant="outline" className="justify-between h-auto py-3" style={{ borderColor: 'var(--color-border-default)', borderRadius: 'var(--radius-md)' }}>
                     {topic}
                     <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -298,14 +299,14 @@ const CompatibilityDeepDive = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-emerald-200 bg-emerald-50">
+          <Card style={{ backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)', borderRadius: 'var(--radius-lg)' }}>
             <CardContent className="pt-6 text-center">
-              <Sparkles className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-              <p className="font-medium">Prochaine étape recommandée</p>
-              <p className="text-sm text-muted-foreground mt-1">
+              <Sparkles className="h-8 w-8 mx-auto mb-2" style={{ color: 'var(--color-primary)' }} />
+              <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Prochaine étape recommandée</p>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
                 Complétez les "Questions du Couple" ensemble pour affiner votre analyse
               </p>
-              <Button className="mt-3 bg-emerald-600 hover:bg-emerald-700">
+              <Button className="mt-3" style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>
                 Accéder aux Questions du Couple
               </Button>
             </CardContent>

@@ -13,8 +13,8 @@ const CompatibilityInsightsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <div className="animate-spin rounded-full h-8 w-8" style={{ borderBottom: '2px solid var(--color-primary)' }}></div>
       </div>
     );
   }
@@ -26,16 +26,16 @@ const CompatibilityInsightsPage: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-card rounded-lg border p-6">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Mes Insights de Compatibilité</h1>
-        <p className="text-muted-foreground">
+      <div className="p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Mes Insights de Compatibilité</h1>
+        <p style={{ color: 'var(--color-text-muted)' }}>
           Analyses personnalisées basées sur votre test de compatibilité
         </p>
       </div>
 
       {/* Achievements Overview */}
-      <div className="bg-card rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-4">Progression & Récompenses</h2>
+      <div className="p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
+        <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Progression & Récompenses</h2>
         <CompatibilityAchievements
           completionPercentage={100}
           insightsViewed={3}
@@ -45,14 +45,14 @@ const CompatibilityInsightsPage: React.FC = () => {
       </div>
 
       {/* Main Insights Section */}
-      <div className="bg-card rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-4">Analyses Détaillées</h2>
+      <div className="p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
+        <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Analyses Détaillées</h2>
         <CompatibilityInsights />
       </div>
 
       {/* Gamified Section */}
-      <div className="bg-card rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-4">Système de Progression</h2>
+      <div className="p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
+        <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Système de Progression</h2>
         <GamifiedInsights />
       </div>
     </div>

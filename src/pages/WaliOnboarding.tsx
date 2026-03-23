@@ -180,15 +180,15 @@ const WaliOnboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 flex items-center justify-center">
+    <div className="min-h-screen p-4 flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto max-w-2xl">
-        <Card className="shadow-lg">
+        <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }}>
           <CardHeader className="text-center">
-            <div className="h-16 w-16 bg-gradient-to-br from-emerald to-gold rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="h-8 w-8 text-primary-foreground" />
+            <div className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--color-primary)' }}>
+              <Shield className="h-8 w-8" style={{ color: '#fff' }} />
             </div>
-            <CardTitle className="text-2xl">Créez votre Profil Wali</CardTitle>
-            <p className="text-muted-foreground">
+            <CardTitle className="text-2xl" style={{ color: 'var(--color-text-primary)' }}>Créez votre Profil Wali</CardTitle>
+            <p style={{ color: 'var(--color-text-secondary)' }}>
               Complétez votre profil pour commencer à superviser les interactions matrimoniales
             </p>
           </CardHeader>
@@ -205,7 +205,7 @@ const WaliOnboarding = () => {
 
               {/* Full Name */}
               <div>
-                <Label htmlFor="full_name" className="text-sm font-medium">
+                <Label htmlFor="full_name" className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                   Nom complet *
                 </Label>
                 <Input
@@ -220,12 +220,13 @@ const WaliOnboarding = () => {
                   disabled={loading}
                   maxLength={100}
                   placeholder="Votre nom complet"
+                  style={{ borderColor: 'var(--color-border-default)', borderRadius: 'var(--radius-md)' }}
                 />
               </div>
 
               {/* Phone (Optional) */}
               <div>
-                <Label htmlFor="phone" className="text-sm font-medium">
+                <Label htmlFor="phone" className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                   Téléphone (optionnel)
                 </Label>
                 <Input
@@ -237,55 +238,56 @@ const WaliOnboarding = () => {
                   disabled={loading}
                   maxLength={20}
                   placeholder="+33 6 12 34 56 78"
+                  style={{ borderColor: 'var(--color-border-default)', borderRadius: 'var(--radius-md)' }}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
                   Pour faciliter la communication avec les personnes que vous supervisez
                 </p>
               </div>
 
               {/* Information Section */}
-              <div className="bg-gradient-to-r from-emerald/5 to-gold/5 p-6 rounded-lg border border-emerald/10">
-                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-emerald" />
+              <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)', borderRadius: 'var(--radius-md)' }}>
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
+                  <Shield className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
                   Votre rôle de Wali
                 </h3>
 
                 <div className="space-y-3 text-sm">
                   <div className="flex items-start gap-3">
-                    <Eye className="h-5 w-5 text-emerald mt-0.5 flex-shrink-0" />
+                    <Eye className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
                     <div>
-                      <p className="font-medium">Supervision des profils</p>
-                      <p className="text-muted-foreground">
+                      <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Supervision des profils</p>
+                      <p style={{ color: 'var(--color-text-muted)' }}>
                         Consultez et approuvez les profils potentiels
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-emerald mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
                     <div>
-                      <p className="font-medium">Approbation des matches</p>
-                      <p className="text-muted-foreground">
+                      <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Approbation des matches</p>
+                      <p style={{ color: 'var(--color-text-muted)' }}>
                         Validez les correspondances avant toute communication
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Bell className="h-5 w-5 text-emerald mt-0.5 flex-shrink-0" />
+                    <Bell className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
                     <div>
-                      <p className="font-medium">Notifications en temps réel</p>
-                      <p className="text-muted-foreground">
+                      <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Notifications en temps réel</p>
+                      <p style={{ color: 'var(--color-text-muted)' }}>
                         Soyez informé de toutes les activités importantes
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <BookOpen className="h-5 w-5 text-emerald mt-0.5 flex-shrink-0" />
+                    <BookOpen className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
                     <div>
-                      <p className="font-medium">Guidance islamique</p>
-                      <p className="text-muted-foreground">
+                      <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Guidance islamique</p>
+                      <p style={{ color: 'var(--color-text-muted)' }}>
                         Accompagnez selon les principes islamiques
                       </p>
                     </div>
@@ -294,12 +296,12 @@ const WaliOnboarding = () => {
               </div>
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full" disabled={loading || !profileData.full_name}>
+              <Button type="submit" className="w-full" disabled={loading || !profileData.full_name} style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>
                 {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Créer mon Espace Wali
               </Button>
 
-              <p className="text-xs text-center text-muted-foreground">
+              <p className="text-xs text-center" style={{ color: 'var(--color-text-muted)' }}>
                 En continuant, vous acceptez de superviser les interactions matrimoniales selon les
                 principes islamiques de respect et de guidance.
               </p>
