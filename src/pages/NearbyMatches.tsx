@@ -6,7 +6,7 @@ import NearbyMatchesContent from './nearby';
 
 const NearbyMatches = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <NearbyMatchesContent />
     </div>
   );

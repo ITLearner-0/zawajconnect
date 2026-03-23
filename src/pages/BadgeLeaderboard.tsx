@@ -265,7 +265,7 @@ export default function BadgeLeaderboard() {
                 {totalBadgesLeaderboard.length > 0 ? (
                   totalBadgesLeaderboard.map((entry) => renderLeaderboardEntry(entry, true, false))
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">No data available yet</p>
+                  <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>No data available yet</p>
                 )}
               </div>
             </CardContent>
@@ -273,10 +273,10 @@ export default function BadgeLeaderboard() {
         </TabsContent>
 
         <TabsContent value="legendary">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Legendary Badges Leaderboard</CardTitle>
-              <CardDescription>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Legendary Badges Leaderboard</CardTitle>
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>
                 Users ranked by their legendary and epic badge collection
               </CardDescription>
             </CardHeader>
@@ -285,7 +285,7 @@ export default function BadgeLeaderboard() {
                 {legendaryLeaderboard.length > 0 ? (
                   legendaryLeaderboard.map((entry) => renderLeaderboardEntry(entry, true, false))
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">No data available yet</p>
+                  <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>No data available yet</p>
                 )}
               </div>
             </CardContent>
@@ -293,17 +293,17 @@ export default function BadgeLeaderboard() {
         </TabsContent>
 
         <TabsContent value="xp">
-          <Card>
+          <Card style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle>Experience Points Leaderboard</CardTitle>
-              <CardDescription>Users ranked by their total XP accumulated</CardDescription>
+              <CardTitle style={{ color: 'var(--color-text-primary)' }}>Experience Points Leaderboard</CardTitle>
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>Users ranked by their total XP accumulated</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {xpLeaderboard.length > 0 ? (
                   xpLeaderboard.map((entry) => renderLeaderboardEntry(entry, false, true))
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">No data available yet</p>
+                  <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>No data available yet</p>
                 )}
               </div>
             </CardContent>

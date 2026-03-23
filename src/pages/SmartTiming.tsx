@@ -84,16 +84,16 @@ const SmartTiming = () => {
   const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl">
+    <div className="container mx-auto py-6 px-4 space-y-6 max-w-4xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-white mb-2">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full text-white mb-2" style={{ backgroundColor: 'var(--color-accent)' }}>
           <Zap className="h-8 w-8" />
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
           Smart Timing & Engagement
         </h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">
+        <p className="max-w-xl mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
           Optimisez vos échanges avec des insights intelligents sur le meilleur moment pour communiquer.
         </p>
       </div>
@@ -102,28 +102,28 @@ const SmartTiming = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <Clock className="h-6 w-6 text-cyan-500 mx-auto mb-1" />
+            <Clock className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-accent)' }} />
             <p className="text-lg font-bold">{engagementData.bestTime}</p>
             <p className="text-xs text-muted-foreground">Meilleure heure</p>
           </CardContent>
         </Card>
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <TrendingUp className="h-6 w-6 text-emerald-500 mx-auto mb-1" />
+            <TrendingUp className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-success)' }} />
             <p className="text-lg font-bold">{engagementData.responseRate}%</p>
             <p className="text-xs text-muted-foreground">Taux de réponse</p>
           </CardContent>
         </Card>
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <Flame className="h-6 w-6 text-orange-500 mx-auto mb-1" />
+            <Flame className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-warning)' }} />
             <p className="text-lg font-bold">{engagementData.streak} jours</p>
             <p className="text-xs text-muted-foreground">Série actuelle</p>
           </CardContent>
         </Card>
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <MessageCircle className="h-6 w-6 text-blue-500 mx-auto mb-1" />
+            <MessageCircle className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-accent)' }} />
             <p className="text-lg font-bold flex items-center justify-center gap-1">
               {engagementData.weeklyMessages}
               <ArrowUp className="h-3 w-3 text-emerald-500" />

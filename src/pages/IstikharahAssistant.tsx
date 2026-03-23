@@ -219,17 +219,17 @@ const IstikharahAssistant = () => {
   };
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-3xl">
+    <div className="container mx-auto py-6 px-4 max-w-3xl" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="flex flex-col h-[calc(100vh-120px)]">
         {/* Header */}
         <div className="text-center space-y-2 pb-4">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-1">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-1" style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>
             <Moon className="h-7 w-7" />
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
             Assistant Istikharah
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Guidance islamique pour vos décisions de mariage
           </p>
         </div>
@@ -238,20 +238,25 @@ const IstikharahAssistant = () => {
         <div className="flex-1 overflow-y-auto space-y-4 pb-4">
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] rounded-2xl p-4 ${
-                message.role === 'user'
-                  ? 'bg-emerald-600 text-white rounded-br-md'
-                  : 'bg-amber-50 border border-amber-200 rounded-bl-md'
-              }`}>
+              <div
+                className={`max-w-[85%] rounded-2xl p-4 ${
+                  message.role === 'user' ? 'rounded-br-md' : 'rounded-bl-md'
+                }`}
+                style={
+                  message.role === 'user'
+                    ? { backgroundColor: 'var(--color-primary)', color: '#fff' }
+                    : { backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }
+                }
+              >
                 {message.role === 'assistant' && (
                   <div className="flex items-center gap-2 mb-2">
-                    <Moon className="h-4 w-4 text-amber-600" />
-                    <span className="text-xs font-medium text-amber-600">Assistant Istikharah</span>
+                    <Moon className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+                    <span className="text-xs font-medium" style={{ color: 'var(--color-primary)' }}>Assistant Istikharah</span>
                   </div>
                 )}
                 <div className={`text-sm leading-relaxed whitespace-pre-line ${
-                  message.role === 'assistant' ? 'text-gray-700' : ''
-                }`}>
+                  message.role === 'assistant' ? '' : ''
+                }`} style={message.role === 'assistant' ? { color: 'var(--color-text-secondary)' } : {}}>
                   {message.content}
                 </div>
               </div>
@@ -260,13 +265,13 @@ const IstikharahAssistant = () => {
 
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl rounded-bl-md p-4">
+              <div className="rounded-2xl rounded-bl-md p-4" style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }}>
                 <div className="flex items-center gap-2">
-                  <Moon className="h-4 w-4 text-amber-600" />
+                  <Moon className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-primary-muted)' }} />
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-primary-muted)', animationDelay: '0.1s' }} />
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--color-primary-muted)', animationDelay: '0.2s' }} />
                   </div>
                 </div>
               </div>
@@ -279,7 +284,7 @@ const IstikharahAssistant = () => {
         {/* Suggested Topics (show only at beginning) */}
         {messages.length <= 1 && (
           <div className="pb-4">
-            <p className="text-xs text-muted-foreground mb-2">Sujets suggérés :</p>
+            <p className="text-xs mb-2" style={{ color: 'var(--color-text-muted)' }}>Sujets suggérés :</p>
             <div className="grid grid-cols-2 gap-2">
               {suggestedTopics.map((topic) => {
                 const Icon = topic.icon;
@@ -287,10 +292,11 @@ const IstikharahAssistant = () => {
                   <Button
                     key={topic.label}
                     variant="outline"
-                    className="h-auto py-2 px-3 text-left justify-start text-xs border-amber-200 hover:bg-amber-50"
+                    className="h-auto py-2 px-3 text-left justify-start text-xs"
+                    style={{ borderColor: 'var(--color-border-default)' }}
                     onClick={() => handleTopicClick(topic)}
                   >
-                    <Icon className="h-3.5 w-3.5 mr-2 text-amber-600 flex-shrink-0" />
+                    <Icon className="h-3.5 w-3.5 mr-2 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
                     <span className="line-clamp-2">{topic.label}</span>
                   </Button>
                 );
@@ -300,7 +306,7 @@ const IstikharahAssistant = () => {
         )}
 
         {/* Input */}
-        <div className="border-t pt-4">
+        <div className="pt-4" style={{ borderTop: '1px solid var(--color-border-default)' }}>
           <div className="flex gap-2">
             <Input
               value={input}
@@ -313,12 +319,12 @@ const IstikharahAssistant = () => {
             <Button
               onClick={() => handleSend()}
               disabled={!input.trim() || isTyping}
-              className="bg-amber-600 hover:bg-amber-700"
+              style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
             >
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
+          <p className="text-xs mt-2 text-center" style={{ color: 'var(--color-text-muted)' }}>
             Cet assistant fournit des informations générales. Pour des situations spécifiques, consultez un savant qualifié.
           </p>
         </div>

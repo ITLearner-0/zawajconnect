@@ -20,37 +20,34 @@ const Resources: React.FC = () => {
 
   // Enhanced resource center view with tabs
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <ResourcesHeader />
 
       <div className="container mx-auto py-12 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-rose-800 dark:text-rose-200 font-serif">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 font-serif" style={{ color: 'var(--color-text-primary)' }}>
             Centre de Ressources Islamiques
           </h1>
-          <p className="text-xl text-rose-600 dark:text-rose-300 max-w-3xl mx-auto">
+          <p className="text-xl max-w-3xl mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
             Ressources complètes pour un mariage islamique réussi : articles, guides pratiques et
             réponses à vos questions
           </p>
         </div>
 
         <Tabs defaultValue="articles" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm border border-rose-200 dark:border-rose-700">
+          <TabsList className="grid w-full grid-cols-3 mb-8 backdrop-blur-sm" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <TabsTrigger
               value="articles"
-              className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-800 dark:data-[state=active]:text-rose-200"
             >
               Articles & Livres
             </TabsTrigger>
             <TabsTrigger
               value="guides"
-              className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-800 dark:data-[state=active]:text-rose-200"
             >
               Guides Pratiques
             </TabsTrigger>
             <TabsTrigger
               value="faq"
-              className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-800 dark:data-[state=active]:text-rose-200"
             >
               FAQ Fiqh
             </TabsTrigger>

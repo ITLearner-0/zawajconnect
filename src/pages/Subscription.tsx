@@ -42,14 +42,14 @@ const Subscription = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950 dark:to-pink-950 py-12 px-4">
+    <div className="min-h-screen py-12 px-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-rose-800 dark:text-rose-200 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--color-primary)' }}>
             Choisissez Votre Plan
           </h1>
-          <p className="text-lg text-rose-600 dark:text-rose-300 max-w-2xl mx-auto">
+          <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
             Trouvez votre moitié selon les principes islamiques avec nos plans adaptés à vos besoins
           </p>
         </div>
@@ -57,14 +57,14 @@ const Subscription = () => {
         {/* Current Subscription Status */}
         {subscribed && (
           <div className="mb-8 text-center">
-            <Card className="max-w-md mx-auto bg-gradient-to-r from-rose-100 to-pink-100 dark:from-rose-900 dark:to-pink-900 border-rose-200 dark:border-rose-700">
+            <Card className="max-w-md mx-auto" style={{ backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)', borderRadius: 'var(--radius-lg)' }}>
               <CardHeader>
-                <CardTitle className="flex items-center justify-center gap-2 text-rose-800 dark:text-rose-200">
+                <CardTitle className="flex items-center justify-center gap-2" style={{ color: 'var(--color-primary)' }}>
                   <Crown className="h-5 w-5" />
                   Abonnement Actuel: {subscription_tier}
                 </CardTitle>
                 {subscription_end && (
-                  <CardDescription className="text-rose-600 dark:text-rose-300">
+                  <CardDescription style={{ color: 'var(--color-text-secondary)' }}>
                     Expire le {formatDate(subscription_end)}
                   </CardDescription>
                 )}
@@ -73,7 +73,8 @@ const Subscription = () => {
                 <Button
                   onClick={handleManageSubscription}
                   disabled={loading}
-                  className="w-full bg-rose-600 hover:bg-rose-700 text-white"
+                  className="w-full"
+                  style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                 >
                   {loading ? (
                     <>
@@ -92,39 +93,39 @@ const Subscription = () => {
         {/* Pricing Plans */}
         <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Plan Gratuit */}
-          <Card className="relative border-2 border-gray-200 dark:border-gray-700">
+          <Card className="relative" style={{ backgroundColor: 'var(--color-bg-card)', border: '2px solid var(--color-border-default)', borderRadius: 'var(--radius-lg)' }}>
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+              <CardTitle className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
                 Gratuit
               </CardTitle>
-              <CardDescription>Commencez votre recherche</CardDescription>
-              <div className="text-3xl font-bold text-gray-800 dark:text-gray-200">
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>Commencez votre recherche</CardDescription>
+              <div className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
                 0€<span className="text-sm font-normal">/mois</span>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Profil de base</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Profil de base</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Navigation illimitée des profils</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Navigation illimitée des profils</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Messages limités</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Messages limités</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Recherche de base</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Recherche de base</span>
                 </li>
-                <li className="flex items-center gap-2 text-gray-500">
-                  <span className="text-xs">⚠️ Likes/matches Premium uniquement</span>
+                <li className="flex items-center gap-2" style={{ color: 'var(--color-text-muted)' }}>
+                  <span className="text-xs">Likes/matches Premium uniquement</span>
                 </li>
               </ul>
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="outline" className="w-full" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}>
                 <Link to="/auth">Commencer Gratuitement</Link>
               </Button>
             </CardContent>
@@ -132,50 +133,56 @@ const Subscription = () => {
 
           {/* Plan Premium */}
           <Card
-            className={`relative border-2 ${isPremium ? 'border-rose-500 bg-rose-50 dark:bg-rose-950' : 'border-rose-300'}`}
+            className="relative"
+            style={{
+              backgroundColor: isPremium ? 'var(--color-primary-light)' : 'var(--color-bg-card)',
+              border: isPremium ? '2px solid var(--color-primary)' : '2px solid var(--color-primary-border)',
+              borderRadius: 'var(--radius-lg)',
+            }}
           >
             {isPremium && (
-              <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-rose-500 text-white">
+              <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2" style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>
                 Plan Actuel
               </Badge>
             )}
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-rose-800 dark:text-rose-200 flex items-center gap-2">
+              <CardTitle className="text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--color-primary)' }}>
                 <Star className="h-6 w-6" />
                 Premium
               </CardTitle>
-              <CardDescription>Recherche avancée et messages illimités</CardDescription>
-              <div className="text-3xl font-bold text-rose-800 dark:text-rose-200">
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>Recherche avancée et messages illimités</CardDescription>
+              <div className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
                 9,99€<span className="text-sm font-normal">/mois</span>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Tout du plan gratuit</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Tout du plan gratuit</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Likes et matches illimités</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Likes et matches illimités</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Messages illimités</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Messages illimités</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Filtres de recherche avancés</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Filtres de recherche avancés</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Voir qui a visité votre profil</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Voir qui a visité votre profil</span>
                 </li>
               </ul>
               <Button
                 onClick={handlePremiumClick}
                 disabled={loading || isPremium}
-                className="w-full bg-rose-600 hover:bg-rose-700 text-white"
+                className="w-full"
+                style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
               >
                 {loading ? (
                   <>
@@ -193,53 +200,59 @@ const Subscription = () => {
 
           {/* Plan VIP */}
           <Card
-            className={`relative border-2 ${isVip ? 'border-purple-500 bg-purple-50 dark:bg-purple-950' : 'border-purple-300'}`}
+            className="relative"
+            style={{
+              backgroundColor: isVip ? 'var(--color-accent-light)' : 'var(--color-bg-card)',
+              border: isVip ? '2px solid var(--color-accent)' : '2px solid var(--color-accent-border)',
+              borderRadius: 'var(--radius-lg)',
+            }}
           >
             {isVip && (
-              <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white">
+              <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2" style={{ backgroundColor: 'var(--color-accent)', color: '#fff' }}>
                 Plan Actuel
               </Badge>
             )}
-            <Badge className="absolute -top-2 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
+            <Badge className="absolute -top-2 right-4" style={{ backgroundColor: 'var(--color-warning)', color: '#fff' }}>
               Recommandé
             </Badge>
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+              <CardTitle className="text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--color-accent)' }}>
                 <Crown className="h-6 w-6" />
                 VIP
               </CardTitle>
-              <CardDescription>Accès complet + conseiller matrimonial</CardDescription>
-              <div className="text-3xl font-bold text-purple-800 dark:text-purple-200">
+              <CardDescription style={{ color: 'var(--color-text-secondary)' }}>Accès complet + conseiller matrimonial</CardDescription>
+              <div className="text-3xl font-bold" style={{ color: 'var(--color-accent)' }}>
                 19,99€<span className="text-sm font-normal">/mois</span>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span>Tout du plan Premium</span>
+                  <Check className="h-4 w-4" style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Tout du plan Premium</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-yellow-500" />
-                  <span>Profil vérifié prioritaire</span>
+                  <Zap className="h-4 w-4" style={{ color: 'var(--color-warning)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Profil vérifié prioritaire</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-yellow-500" />
-                  <span>Conseiller matrimonial dédié</span>
+                  <Zap className="h-4 w-4" style={{ color: 'var(--color-warning)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Conseiller matrimonial dédié</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-yellow-500" />
-                  <span>Visibilité maximale du profil</span>
+                  <Zap className="h-4 w-4" style={{ color: 'var(--color-warning)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Visibilité maximale du profil</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-yellow-500" />
-                  <span>Support prioritaire</span>
+                  <Zap className="h-4 w-4" style={{ color: 'var(--color-warning)' }} />
+                  <span style={{ color: 'var(--color-text-primary)' }}>Support prioritaire</span>
                 </li>
               </ul>
               <Button
                 onClick={handleVipClick}
                 disabled={loading || isVip}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                className="w-full"
+                style={{ backgroundColor: 'var(--color-accent)', color: '#fff', borderRadius: 'var(--radius-md)' }}
               >
                 {loading ? (
                   <>
@@ -258,57 +271,57 @@ const Subscription = () => {
 
         {/* Features Comparison */}
         <div className="mt-16">
-          <h2 className="text-3xl font-bold text-center text-rose-800 dark:text-rose-200 mb-8">
+          <h2 className="text-3xl font-bold text-center mb-8" style={{ color: 'var(--color-primary)' }}>
             Comparaison des Fonctionnalités
           </h2>
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden">
+          <div className="overflow-hidden" style={{ backgroundColor: 'var(--color-bg-card)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }}>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-rose-50 dark:bg-rose-900">
+                <thead style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
                   <tr>
-                    <th className="px-6 py-4 text-left text-rose-800 dark:text-rose-200 font-semibold">
+                    <th className="px-6 py-4 text-left font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                       Fonctionnalités
                     </th>
-                    <th className="px-6 py-4 text-center text-gray-600 dark:text-gray-300 font-semibold">
+                    <th className="px-6 py-4 text-center font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
                       Gratuit
                     </th>
-                    <th className="px-6 py-4 text-center text-rose-600 dark:text-rose-300 font-semibold">
+                    <th className="px-6 py-4 text-center font-semibold" style={{ color: 'var(--color-primary)' }}>
                       Premium
                     </th>
-                    <th className="px-6 py-4 text-center text-purple-600 dark:text-purple-300 font-semibold">
+                    <th className="px-6 py-4 text-center font-semibold" style={{ color: 'var(--color-accent)' }}>
                       VIP
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  <tr>
-                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                    <td className="px-6 py-4" style={{ color: 'var(--color-text-primary)' }}>
                       Correspondances par jour
                     </td>
-                    <td className="px-6 py-4 text-center">5</td>
-                    <td className="px-6 py-4 text-center">Illimitées</td>
-                    <td className="px-6 py-4 text-center">Illimitées</td>
+                    <td className="px-6 py-4 text-center" style={{ color: 'var(--color-text-secondary)' }}>5</td>
+                    <td className="px-6 py-4 text-center" style={{ color: 'var(--color-text-secondary)' }}>Illimitées</td>
+                    <td className="px-6 py-4 text-center" style={{ color: 'var(--color-text-secondary)' }}>Illimitées</td>
                   </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">Messages</td>
-                    <td className="px-6 py-4 text-center">Limités</td>
-                    <td className="px-6 py-4 text-center">Illimités</td>
-                    <td className="px-6 py-4 text-center">Illimités</td>
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                    <td className="px-6 py-4" style={{ color: 'var(--color-text-primary)' }}>Messages</td>
+                    <td className="px-6 py-4 text-center" style={{ color: 'var(--color-text-secondary)' }}>Limités</td>
+                    <td className="px-6 py-4 text-center" style={{ color: 'var(--color-text-secondary)' }}>Illimités</td>
+                    <td className="px-6 py-4 text-center" style={{ color: 'var(--color-text-secondary)' }}>Illimités</td>
                   </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">Filtres avancés</td>
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                    <td className="px-6 py-4" style={{ color: 'var(--color-text-primary)' }}>Filtres avancés</td>
                     <td className="px-6 py-4 text-center">❌</td>
                     <td className="px-6 py-4 text-center">✅</td>
                     <td className="px-6 py-4 text-center">✅</td>
                   </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">Profil vérifié</td>
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                    <td className="px-6 py-4" style={{ color: 'var(--color-text-primary)' }}>Profil vérifié</td>
                     <td className="px-6 py-4 text-center">❌</td>
                     <td className="px-6 py-4 text-center">❌</td>
                     <td className="px-6 py-4 text-center">✅</td>
                   </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                    <td className="px-6 py-4" style={{ color: 'var(--color-text-primary)' }}>
                       Conseiller matrimonial
                     </td>
                     <td className="px-6 py-4 text-center">❌</td>
