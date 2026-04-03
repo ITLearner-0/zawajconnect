@@ -144,7 +144,7 @@ const EducationCareerSection = ({
             }
           />
         ) : (
-          <div className="text-center py-8 text-gray-500 italic">
+          <div className="text-center py-8 italic" style={{ color: 'var(--color-text-muted)' }}>
             Aucune information professionnelle disponible
           </div>
         )}

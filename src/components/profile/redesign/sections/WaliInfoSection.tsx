@@ -81,7 +81,7 @@ const WaliInfoSection = ({
               size="sm"
               variant="outline"
               onClick={onContactWali}
-              className="text-emerald-600 border-emerald-300 hover:bg-emerald-50"
+              style={{ color: 'var(--color-primary)', borderColor: 'var(--color-primary-border)' }}
             >
               <Phone className="h-3 w-3 mr-2" />
               Contacter le Wali
@@ -123,8 +123,8 @@ const WaliInfoSection = ({
 
             {/* Information about Wali importance */}
             {!isOwnProfile && (
-              <div className="mt-4 p-4 bg-sage-50 border border-sage-200 rounded-lg">
-                <p className="text-sm text-sage-800">
+              <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   ℹ️ <strong>À propos du Wali :</strong> Conformément aux enseignements islamiques,
                   le wali (tuteur) joue un rôle important dans le processus de mariage. Toute
                   communication sérieuse doit passer par le wali.
@@ -134,8 +134,8 @@ const WaliInfoSection = ({
 
             {/* Verification encouragement for own profile */}
             {isOwnProfile && !isWaliVerified && (
-              <div className="mt-4 p-4 bg-gold-50 border border-gold-200 rounded-lg">
-                <p className="text-sm text-gold-800">
+              <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-warning-bg)', border: '1px solid var(--color-warning-border)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-warning)' }}>
                   💡 <strong>Conseil :</strong> Faites vérifier votre wali pour augmenter la
                   confiance des autres utilisateurs. Les profils avec wali vérifié reçoivent 2x plus
                   de demandes sérieuses.
@@ -163,11 +163,11 @@ const WaliInfoSection = ({
           />
         ) : (
           <div className="text-center py-8 space-y-4">
-            <p className="text-gray-500 italic">
+            <p className="italic" style={{ color: 'var(--color-text-muted)' }}>
               Aucune information de wali disponible
             </p>
             {profile.gender === 'female' && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 Cette utilisatrice n'a pas encore ajouté les informations de son wali.
               </p>
             )}

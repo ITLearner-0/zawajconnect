@@ -199,8 +199,8 @@ const IslamicPreferencesSection = ({
             <InfoGrid columns={2} items={gridItems} />
 
             {!isComplete && isOwnProfile && (
-              <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <p className="text-sm text-emerald-800">
+              <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-success)' }}>
                   💡 <strong>Conseil :</strong> Complétez vos préférences islamiques pour
                   améliorer la qualité de vos matches. Les profils complets reçoivent 3x plus
                   d'attention !
@@ -223,7 +223,7 @@ const IslamicPreferencesSection = ({
             }
           />
         ) : (
-          <div className="text-center py-8 text-gray-500 italic">
+          <div className="text-center py-8 italic" style={{ color: 'var(--color-text-muted)' }}>
             Les préférences islamiques ne sont pas disponibles
           </div>
         )}

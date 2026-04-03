@@ -50,7 +50,7 @@ const PhotoGallerySection = ({
           ? 'border-emerald-500 text-emerald-700'
           : photoCount > 0
             ? 'border-gold-500 text-gold-700'
-            : 'border-gray-400 text-gray-600'
+            : ''
       }
     >
       <Camera className="h-3 w-3 mr-1" />
@@ -160,7 +160,8 @@ const PhotoGallerySection = ({
                   animate="visible"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gold-500 hover:bg-gold-50 transition-colors"
+                  className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors"
+                  style={{ borderColor: 'var(--color-border-default)' }}
                 >
                   <input
                     type="file"
@@ -172,13 +173,13 @@ const PhotoGallerySection = ({
                   {uploadingIndex === photoCount ? (
                     <div className="text-center">
                       <div className="h-8 w-8 animate-spin rounded-full border-4 border-gold-500 border-t-transparent mx-auto mb-2" />
-                      <span className="text-sm text-gray-600">Upload...</span>
+                      <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Upload...</span>
                     </div>
                   ) : (
                     <div className="text-center">
-                      <Upload className="h-8 w-8 text-gray-400 mb-2 mx-auto" />
-                      <span className="text-sm font-medium text-gray-600">Ajouter</span>
-                      <span className="text-xs text-gray-500 block mt-1">Max 5MB</span>
+                      <Upload className="h-8 w-8 mb-2 mx-auto" style={{ color: 'var(--color-text-muted)' }} />
+                      <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Ajouter</span>
+                      <span className="text-xs block mt-1" style={{ color: 'var(--color-text-muted)' }}>Max 5MB</span>
                     </div>
                   )}
                 </motion.label>
