@@ -90,16 +90,17 @@ export const StatCard = ({
     <motion.div
       whileHover={{ scale: 1.02, y: -2 }}
       className={cn(
-        'bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow',
+        'rounded-2xl p-6 transition-shadow',
         className
       )}
+      style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-2">{label}</p>
+          <p className="text-sm font-medium text-[var(--color-text-muted)] mb-2">{label}</p>
           <p className={cn('text-3xl font-bold tabular-nums', colors.textDark)}>{value}</p>
           {trend && (
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-[var(--color-text-muted)] mt-2">
               <span className={trend.value >= 0 ? 'text-emerald-600' : 'text-rose-600'}>
                 {trend.value >= 0 ? '+' : ''}
                 {trend.value}%
@@ -173,7 +174,7 @@ export const StatItem = ({
         <Icon className={cn(colors.text, sizeClasses.icon)} />
       </div>
       <div className={cn('font-bold', colors.textDark, sizeClasses.value)}>{value}</div>
-      <div className="text-gray-500 uppercase tracking-wide" style={{ fontSize: '0.7rem' }}>
+      <div className="text-[var(--color-text-muted)] uppercase tracking-wide" style={{ fontSize: '0.7rem' }}>
         {label}
       </div>
     </motion.div>
@@ -220,13 +221,13 @@ export const ProgressItem = ({
               <Icon className={cn('h-3 w-3', colors.text)} />
             </div>
           )}
-          <span className="text-sm font-medium text-gray-700">{label}</span>
+          <span className="text-sm font-medium text-[var(--color-text-secondary)]">{label}</span>
         </div>
         {showPercentage && (
-          <span className="text-sm font-semibold text-gray-900">{percentage}%</span>
+          <span className="text-sm font-semibold text-[var(--color-text-primary)]">{percentage}%</span>
         )}
       </div>
-      <div className={cn('w-full bg-gray-200 rounded-full overflow-hidden', sizes[size])}>
+      <div className={cn('w-full bg-[var(--color-bg-subtle)] rounded-full overflow-hidden', sizes[size])}>
         <motion.div
           initial={animated ? { width: 0 } : { width: `${percentage}%` }}
           animate={{ width: `${percentage}%` }}
@@ -297,7 +298,7 @@ export const CircularProgress = ({
         {showPercentage && (
           <span className={cn('text-2xl font-bold', colors.textDark)}>{percentage}%</span>
         )}
-        {label && <span className="text-xs text-gray-500 mt-1">{label}</span>}
+        {label && <span className="text-xs text-[var(--color-text-muted)] mt-1">{label}</span>}
       </div>
     </div>
   );
@@ -321,17 +322,17 @@ export const MetricRow = ({ icon: Icon, label, value, color = 'sage', badge }: M
   return (
     <motion.div
       whileHover={{ x: 4 }}
-      className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors"
+      className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors"
     >
       <div className="flex items-center gap-3">
         <div className={cn('p-2 rounded-lg', colors.bgLight)}>
           <Icon className={cn('h-4 w-4', colors.text)} />
         </div>
-        <span className="text-sm text-gray-700">{label}</span>
+        <span className="text-sm text-[var(--color-text-secondary)]">{label}</span>
       </div>
       <div className="flex items-center gap-2">
         {badge}
-        <span className="text-lg font-semibold text-gray-900">{value}</span>
+        <span className="text-lg font-semibold text-[var(--color-text-primary)]">{value}</span>
       </div>
     </motion.div>
   );
@@ -370,10 +371,10 @@ export const ComparisonBar = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-gray-700">{label}</span>
+        <span className="font-medium text-[var(--color-text-secondary)]">{label}</span>
       </div>
 
-      <div className="flex items-center gap-2 h-8 rounded-full overflow-hidden bg-gray-200">
+      <div className="flex items-center gap-2 h-8 rounded-full overflow-hidden bg-[var(--color-bg-subtle)]">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${leftPercentage}%` }}
@@ -391,10 +392,10 @@ export const ComparisonBar = ({
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-1">
           <div className={cn('w-2 h-2 rounded-full', leftColors.bg)} />
-          <span className="text-gray-600">{leftLabel}: {leftValue}</span>
+          <span className="text-[var(--color-text-muted)]">{leftLabel}: {leftValue}</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-gray-600">{rightLabel}: {rightValue}</span>
+          <span className="text-[var(--color-text-muted)]">{rightLabel}: {rightValue}</span>
           <div className={cn('w-2 h-2 rounded-full', rightColors.bg)} />
         </div>
       </div>
