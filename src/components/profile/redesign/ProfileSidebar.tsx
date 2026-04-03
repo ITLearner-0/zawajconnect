@@ -9,10 +9,7 @@ import {
   Camera,
   Sparkles,
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import { DatabaseProfile } from '@/types/profile';
 import { BadgeShowcase } from '@/components/gamification/BadgeShowcase';
 import { fadeInRight, staggerContainer, staggerItem, buttonVariants } from '@/styles/animations';
@@ -37,12 +34,6 @@ interface ProfileSidebarProps {
   onContactWali?: () => void;
 }
 
-/**
- * Profile Sidebar Component
- *
- * Displays action buttons, progress tracking, stats, and badges.
- * Adapts based on whether viewing own profile or another user's profile.
- */
 const ProfileSidebar = ({
   profile,
   isOwnProfile,
@@ -67,48 +58,62 @@ const ProfileSidebar = ({
       variants={fadeInRight}
       initial="hidden"
       animate="visible"
-      className="space-y-6"
+      className="space-y-4"
     >
-      {/* Action Buttons (for other profiles) - Hidden on mobile, shown in MobileActionBar instead */}
+      {/* Action Buttons (for other profiles) */}
       {!isOwnProfile && (
         <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="hidden lg:block">
-          <Card className="p-6">
+          <div
+            className="rounded-2xl p-5"
+            style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+          >
             <motion.div variants={staggerItem} className="space-y-3">
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button
+                <button
                   onClick={onMessage}
-                  className="w-full bg-rose-500 hover:bg-rose-600 text-white shadow-md touch-manipulation min-h-[44px]"
+                  className="w-full py-2.5 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
+                  style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}
                 >
-                  <Heart className="h-4 w-4 mr-2" />
+                  <Heart className="h-4 w-4" />
                   Envoyer un Message
-                </Button>
+                </button>
               </motion.div>
 
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button
+                <button
                   onClick={onVideoCall}
-                  variant="outline"
-                  className="w-full border-2 hover:bg-gray-50 touch-manipulation min-h-[44px]"
+                  className="w-full py-2.5 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-text-primary)',
+                    border: '1px solid var(--color-border-default)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
                 >
-                  <Video className="h-4 w-4 mr-2" />
+                  <Video className="h-4 w-4" />
                   Appel Vidéo
-                </Button>
+                </button>
               </motion.div>
 
               {profile.wali_name && (
                 <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                  <Button
+                  <button
                     onClick={onContactWali}
-                    variant="outline"
-                    className="w-full border-2 hover:bg-gray-50 touch-manipulation min-h-[44px]"
+                    className="w-full py-2.5 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--color-text-primary)',
+                      border: '1px solid var(--color-border-default)',
+                      borderRadius: 'var(--radius-md)',
+                    }}
                   >
-                    <Users className="h-4 w-4 mr-2" />
+                    <Users className="h-4 w-4" />
                     Contacter le Wali
-                  </Button>
+                  </button>
                 </motion.div>
               )}
             </motion.div>
-          </Card>
+          </div>
         </motion.div>
       )}
 
@@ -119,55 +124,40 @@ const ProfileSidebar = ({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="p-6">
-            <CardHeader className="p-0 mb-4">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-emerald-600" />
-                Progression du Profil
-              </CardTitle>
-            </CardHeader>
+          <div
+            className="rounded-2xl p-5"
+            style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+          >
+            <h3 className="text-base font-semibold flex items-center gap-2 mb-4" style={{ color: 'var(--color-text-primary)' }}>
+              <TrendingUp className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+              Progression du Profil
+            </h3>
 
-            <CardContent className="p-0 space-y-3">
-              <ProgressItem
-                label="Infos de base"
-                percentage={completionStats.basicInfo}
-                color="emerald"
-                icon={Sparkles}
-              />
-              <ProgressItem
-                label="Photos"
-                percentage={completionStats.photos}
-                color="gold"
-                icon={Camera}
-              />
-              <ProgressItem
-                label="Préférences"
-                percentage={completionStats.islamicPrefs}
-                color="rose"
-                icon={Heart}
-              />
+            <div className="space-y-3">
+              <ProgressItem label="Infos de base" percentage={completionStats.basicInfo} color="primary" icon={Sparkles} />
+              <ProgressItem label="Photos" percentage={completionStats.photos} color="warning" icon={Camera} />
+              <ProgressItem label="Préférences" percentage={completionStats.islamicPrefs} color="info" icon={Heart} />
 
-              {/* Overall Score */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--color-border-default)' }}>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-gray-700">Score Global</span>
-                  <Badge
-                    variant="outline"
-                    className={getScoreColorClass(completionStats.overall)}
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Score Global</span>
+                  <span
+                    className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: 'var(--color-primary-light)',
+                      color: 'var(--color-primary)',
+                    }}
                   >
                     {completionStats.overall}%
-                  </Badge>
+                  </span>
                 </div>
-                <Progress
-                  value={completionStats.overall}
-                  className="h-3"
-                />
-                <p className="text-xs text-gray-500 mt-2">
+                <Progress value={completionStats.overall} className="h-2.5" />
+                <p className="text-xs mt-2" style={{ color: 'var(--color-text-muted)' }}>
                   {getCompletionMessage(completionStats.overall)}
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       )}
 
@@ -177,29 +167,20 @@ const ProfileSidebar = ({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <Card className="p-6">
-          <CardHeader className="p-0 mb-4">
-            <CardTitle className="text-lg">Statistiques</CardTitle>
-          </CardHeader>
+        <div
+          className="rounded-2xl p-5"
+          style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+        >
+          <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+            Statistiques
+          </h3>
 
-          <CardContent className="p-0 space-y-3">
-            <StatRow
-              icon={Eye}
-              label="Vues du profil"
-              value={formatNumber(profileStats.views)}
-            />
-            <StatRow
-              icon={Heart}
-              label="Likes reçus"
-              value={formatNumber(profileStats.likes)}
-            />
-            <StatRow
-              icon={MessageCircle}
-              label="Messages"
-              value={formatNumber(profileStats.messages)}
-            />
-          </CardContent>
-        </Card>
+          <div className="space-y-2">
+            <StatRow icon={Eye} label="Vues du profil" value={formatNumber(profileStats.views)} />
+            <StatRow icon={Heart} label="Likes reçus" value={formatNumber(profileStats.likes)} />
+            <StatRow icon={MessageCircle} label="Messages" value={formatNumber(profileStats.messages)} />
+          </div>
+        </div>
       </motion.div>
 
       {/* Badge Showcase */}
@@ -208,15 +189,15 @@ const ProfileSidebar = ({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <Card className="p-6">
-          <CardHeader className="p-0 mb-4">
-            <CardTitle className="text-lg">Badges</CardTitle>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            <BadgeShowcase userId={profile.id} maxBadges={6} />
-          </CardContent>
-        </Card>
+        <div
+          className="rounded-2xl p-5"
+          style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+        >
+          <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+            Badges
+          </h3>
+          <BadgeShowcase userId={profile.id} maxBadges={6} />
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -229,51 +210,37 @@ const ProfileSidebar = ({
 interface ProgressItemProps {
   label: string;
   percentage: number;
-  color: 'emerald' | 'gold' | 'rose';
+  color: 'primary' | 'warning' | 'info';
   icon: React.ElementType;
 }
 
 export const ProgressItem = ({ label, percentage, color, icon: Icon }: ProgressItemProps) => {
-  const colorClasses = {
-    emerald: {
-      bg: 'bg-emerald-500',
-      text: 'text-emerald-600',
-      light: 'bg-emerald-100',
-    },
-    gold: {
-      bg: 'bg-gold-500',
-      text: 'text-gold-600',
-      light: 'bg-gold-100',
-    },
-    rose: {
-      bg: 'bg-rose-500',
-      text: 'text-rose-600',
-      light: 'bg-rose-100',
-    },
+  const colorMap = {
+    primary: { var: 'var(--color-primary)', bg: 'var(--color-primary-light)' },
+    warning: { var: 'var(--color-warning)', bg: 'var(--color-warning-bg)' },
+    info: { var: 'var(--color-info)', bg: 'var(--color-info-bg)' },
   };
 
-  const classes = colorClasses[color];
+  const c = colorMap[color];
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      className="space-y-1"
-    >
+    <motion.div whileHover={{ scale: 1.02 }} className="space-y-1">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={`p-1 rounded ${classes.light}`}>
-            <Icon className={`h-3 w-3 ${classes.text}`} />
+          <div className="p-1 rounded" style={{ backgroundColor: c.bg }}>
+            <Icon className="h-3 w-3" style={{ color: c.var }} />
           </div>
-          <span className="text-sm font-medium text-gray-700">{label}</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>{label}</span>
         </div>
-        <span className="text-sm font-semibold text-gray-900">{percentage}%</span>
+        <span className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>{percentage}%</span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+      <div className="w-full rounded-full h-2 overflow-hidden" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-          className={`h-full ${classes.bg}`}
+          className="h-full rounded-full"
+          style={{ backgroundColor: c.var }}
         />
       </div>
     </motion.div>
@@ -294,15 +261,18 @@ const StatRow = ({ icon: Icon, label, value }: StatRowProps) => {
   return (
     <motion.div
       whileHover={{ x: 4 }}
-      className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors"
+      className="flex items-center justify-between py-2 px-3 rounded-lg transition-colors"
+      style={{ backgroundColor: 'transparent' }}
+      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)')}
+      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
     >
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-sage-100">
-          <Icon className="h-4 w-4 text-sage-600" />
+        <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-primary-light)' }}>
+          <Icon className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
         </div>
-        <span className="text-sm text-gray-700">{label}</span>
+        <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{label}</span>
       </div>
-      <span className="text-lg font-semibold text-gray-900">{value}</span>
+      <span className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>{value}</span>
     </motion.div>
   );
 };
@@ -310,13 +280,6 @@ const StatRow = ({ icon: Icon, label, value }: StatRowProps) => {
 // ============================================================================
 // Helper Functions
 // ============================================================================
-
-const getScoreColorClass = (percentage: number): string => {
-  if (percentage >= 80) return 'border-emerald-500 text-emerald-700';
-  if (percentage >= 60) return 'border-gold-500 text-gold-700';
-  if (percentage >= 40) return 'border-amber-500 text-amber-700';
-  return 'border-rose-500 text-rose-700';
-};
 
 const getCompletionMessage = (percentage: number): string => {
   if (percentage >= 90) return 'Excellent ! Votre profil est presque parfait.';

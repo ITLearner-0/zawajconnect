@@ -141,40 +141,38 @@ const ProfilePage = () => {
     // If user is not authenticated, redirect to auth page
     if (error.includes('No authenticated user found')) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 flex items-center justify-center">
-          <Card className="max-w-md mx-auto">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold text-red-600 mb-4">Authentification requise</h2>
-              <p className="text-gray-600 mb-4">
-                Vous devez être connecté pour accéder à votre profil.
-              </p>
-              <button
-                onClick={() => navigate('/auth')}
-                className="w-full bg-rose-500 text-white py-2 px-4 rounded hover:bg-rose-600"
-              >
-                Se connecter
-              </button>
-            </CardContent>
-          </Card>
+        <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+          <div className="max-w-md mx-auto rounded-2xl p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-danger)' }}>Authentification requise</h2>
+            <p className="mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+              Vous devez être connecté pour accéder à votre profil.
+            </p>
+            <button
+              onClick={() => navigate('/auth')}
+              className="w-full py-2 px-4 rounded-xl"
+              style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+            >
+              Se connecter
+            </button>
+          </div>
         </div>
       );
     }
 
     // Other errors
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 flex items-center justify-center">
-        <Card className="max-w-md mx-auto">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold text-red-600 mb-4">Erreur de chargement</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full bg-rose-500 text-white py-2 px-4 rounded hover:bg-rose-600"
-            >
-              Réessayer
-            </button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-page)' }}>
+        <div className="max-w-md mx-auto rounded-2xl p-6" style={{ backgroundColor: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}>
+          <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-danger)' }}>Erreur de chargement</h2>
+          <p className="mb-4" style={{ color: 'var(--color-text-secondary)' }}>{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full py-2 px-4 rounded-xl"
+            style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+          >
+            Réessayer
+          </button>
+        </div>
       </div>
     );
   }

@@ -100,7 +100,7 @@ const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps
       size="sm"
       variant="ghost"
       onClick={handleStartEdit}
-      className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+      style={{ color: 'var(--color-primary)' }}
     >
       <Edit2 className="h-4 w-4 mr-1" />
       Modifier
@@ -137,7 +137,7 @@ const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps
               autoFocus
             />
 
-            <div className="text-sm text-gray-600 space-y-2">
+            <div className="text-sm space-y-2" style={{ color: 'var(--color-text-secondary)' }}>
               <p>💡 <strong>Conseils :</strong></p>
               <ul className="list-disc list-inside space-y-1 ml-4">
                 <li>Soyez authentique et sincère</li>
@@ -147,11 +147,11 @@ const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps
               </ul>
             </div>
 
-            <div className="flex items-center gap-2 pt-2 border-t">
+            <div className="flex items-center gap-2 pt-2" style={{ borderTop: '1px solid var(--color-border-default)' }}>
               <Button
                 onClick={handleSave}
                 disabled={isSaving || aboutText.length > MAX_LENGTH}
-                className="bg-emerald-500 hover:bg-emerald-600"
+                style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
               >
                 <Save className="h-4 w-4 mr-2" />
                 {isSaving ? 'Enregistrement...' : 'Enregistrer'}
@@ -182,7 +182,7 @@ const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps
           />
         ) : (
           // Empty state for other profiles
-          <SectionText className="text-gray-500 italic">
+          <SectionText className="italic">
             Aucune description disponible
           </SectionText>
         )}

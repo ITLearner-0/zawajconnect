@@ -75,31 +75,47 @@
   --shadow-md: 0 2px 8px rgba(26, 20, 12, 0.08);
 }
 
-/* Dark mode — palette ajustée */
+/* Dark mode — palette ajustée (plus lisible, contraste amélioré) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primary:        #4a9e6a;
-    --color-primary-hover:  #5ab87a;
-    --color-primary-light:  #0f2018;
-    --color-primary-muted:  #1a3828;
-    --color-primary-border: #2a5c3a;
+    --color-primary:        #5cb88a;
+    --color-primary-hover:  #4aae78;
+    --color-primary-light:  #1a2e24;
+    --color-primary-muted:  #243830;
+    --color-primary-border: #3a6850;
 
-    --color-accent:         #6090d8;
-    --color-accent-light:   #0c1c30;
+    --color-accent:         #78a8e0;
+    --color-accent-light:   #182840;
 
-    --color-bg-page:        #0e0d0b;
-    --color-bg-card:        #161512;
-    --color-bg-subtle:      #1c1a16;
-    --color-bg-hover:       #222018;
+    --color-bg-page:        #1a1916;
+    --color-bg-card:        #242220;
+    --color-bg-subtle:      #2a2824;
+    --color-bg-hover:       #32302a;
 
-    --color-text-primary:   #f0ece4;
-    --color-text-secondary: #c0bab0;
-    --color-text-muted:     #807870;
-    --color-text-hint:      #605850;
-    --color-text-disabled:  #403830;
+    --color-text-primary:   #f2efe8;
+    --color-text-secondary: #d0ccc4;
+    --color-text-muted:     #a09890;
+    --color-text-hint:      #807870;
+    --color-text-disabled:  #585048;
 
-    --color-border-default: #2a2820;
-    --color-border-subtle:  #221e18;
-    --color-border-strong:  #403828;
+    --color-border-default: #3a3830;
+    --color-border-subtle:  #322e28;
+    --color-border-strong:  #504838;
+
+    --color-success:        #5cb88a;
+    --color-success-bg:     #1a2e24;
+    --color-success-border: #3a6850;
+
+    --color-warning:        #d8a040;
+    --color-warning-bg:     #2e2818;
+    --color-warning-border: #6a5830;
+
+    --color-danger:         #e05050;
+    --color-danger-bg:      #2e1818;
+    --color-danger-border:  #6a3030;
+
+    --color-info:           #78a8e0;
+    --color-info-bg:        #182840;
+    --color-info-border:    #385880;
   }
 }
